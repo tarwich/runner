@@ -20,6 +20,12 @@ module.exports = {
       target: 'browser',
     },
   },
+  /**
+   * Arguments to pass to run
+   *
+   * @type {string[]}
+   */
+  runArguments: [],
   /** Options for building server */
   server: {
     entry: 'src/server/index.js',

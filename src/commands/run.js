@@ -57,7 +57,7 @@ if (module.id === '.') {
           }
         );
         // Get Docker information
-        if (docker) require('../lib/docker')();
+        if (docker) require('../lib/docker').getDockerUrls();
         // Run the server every time the build ends
         let server;
         bundler.on('buildEnd', () => {
@@ -67,9 +67,7 @@ if (module.id === '.') {
             `${server ? 'Restarting' : 'Starting'} server (${outDir})...`
           );
           if (server) server.kill();
-          // FIXME: The 'run' is temporary, because one of my servers needs it, but
-          // I'd like to find a way to remove it
-          server = fork(outDir, ['run'], { env });
+          server = fork(outDir, CONFIG.runArguments || [], { env });
         });
         // Run the bundler
         bundler.bundle();
