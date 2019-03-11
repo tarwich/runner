@@ -4,17 +4,15 @@ const { resolve } = require('path');
 
 const { env } = process;
 
-function run(components, CONFIG) {
-  if (components.length === 0) components = ['client', 'server'];
-  components.forEach(action => {
-    fork(__filename, [], { env }).send({ CONFIG, action });
-  });
-}
-
 function install(program, CONFIG) {
   program.command('build [client|server...]')
   .description('Build the client and / or the server')
-  .action(components => run(components, CONFIG));
+  .action(components => {
+    if (components.length === 0) components = ['client', 'server'];
+    components.forEach(action => {
+      fork(__filename, [], { env }).send({ CONFIG, action });
+    });
+  });
 }
 
 // If this module was run through fork()
@@ -55,4 +53,4 @@ if (module.id === '.') {
   });
 }
 
-module.exports = { install, run };
+module.exports = { install };

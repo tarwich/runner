@@ -17,15 +17,10 @@ function loadCommands() {
       const filePath = resolve(path, file);
 
       if (statSync(filePath).isFile()) {
-        const command = require(filePath);
+        const { install } = require(filePath);
 
-        const missing = ['install', 'run']
-        .filter(key => !command[key])
-        .map(key => `'${key}'`);
-
-        if (missing.length)
-          console.error(`Command ${file} is missing methods: ${missing}`);
-        else command.install(program, CONFIG);
+        if (install) install(program, CONFIG);
+        else console.error(`Command ${file} is missing 'install' function`);
       }
     });
   });

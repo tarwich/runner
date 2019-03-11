@@ -4,17 +4,7 @@ const { resolve } = require('path');
 
 const { env } = process;
 
-let CONFIG;
-
-function run(components, options) {
-  const { docker, port } = options;
-  fork(__filename, [], { env }).send({ CONFIG, action: 'client' });
-  env.PORT = port;
-  fork(__filename, [], { env }).send({ CONFIG, action: 'server', docker });
-}
-
-function install(program, config) {
-  CONFIG = config;
+function install(program, CONFIG) {
   program.command('run [client|server...]')
   .description('Run the client and server with HMR')
   .option('--no-docker', 'Disable the docker detection')
@@ -24,7 +14,12 @@ function install(program, config) {
     Number,
     env.PORT || 8080
   )
-  .action(run);
+  .action((components, options) => {
+    const { docker, port } = options;
+    fork(__filename, [], { env }).send({ CONFIG, action: 'client' });
+    env.PORT = port;
+    fork(__filename, [], { env }).send({ CONFIG, action: 'server', docker });
+  });
 }
 
 // If this module was run through fork()
@@ -80,4 +75,4 @@ if (module.id === '.') {
   });
 }
 
-module.exports = { install, run };
+module.exports = { install };

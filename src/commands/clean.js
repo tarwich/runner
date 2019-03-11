@@ -16,17 +16,15 @@ const rmrf = filePath => {
   else unlinkSync(filePath);
 };
 
-function run() {
-  log('clean', 'Removing .cache/...');
-  rmrf('.cache');
-  log('clean', 'Removing dist/...');
-  rmrf('dist');
-}
-
 function install(program) {
   program.command('clean')
   .description('Remove the .cache and dist folders')
-  .action(run);
+  .action(() => {
+    log('clean', 'Removing .cache/...');
+    rmrf('.cache');
+    log('clean', 'Removing dist/...');
+    rmrf('dist');
+  });
 }
 
-module.exports = { install, rmrf, run };
+module.exports = { install, rmrf };
