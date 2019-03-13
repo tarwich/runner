@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": ".",
+    "checkJs": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "outDir": "dist/ts",
+    "paths": { "*": ["src/types/*"] },
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "es6"
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

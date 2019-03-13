@@ -4,7 +4,8 @@ const { log } = require('../log');
 const { resolve } = require('path');
 
 const { env } = process;
-let CONFIG = {};
+/** @type {import('config').Config} */
+let CONFIG;
 
 /**
  * Run the server
@@ -24,6 +25,11 @@ async function run(options) {
   fork(__filename, [], { env }).send({ CONFIG, action: 'server', docker });
 }
 
+/**
+ * @param {import('commander').Command} program The commander instance to add
+ * commands to
+ * @param {import('config').Config} config The configuration from rnuner
+ */
 function install(program, config) {
   CONFIG = config;
   program.command('run')
@@ -39,6 +45,7 @@ function install(program, config) {
 }
 
 // If this module was run through fork()
+// @ts-ignore
 if (module.id === '.') {
   process.on('message', async({ CONFIG, action, docker } = {}) => {
     try {
@@ -69,8 +76,9 @@ if (module.id === '.') {
         );
         // Get Docker information
         if (docker) require('../lib/docker').getDockerUrls();
-        // Run the server every time the build ends
+        /** @type {import('child_process').ChildProcess} */
         let server;
+        // Run the server every time the build ends
         bundler.on('buildEnd', () => {
           const { outDir } = CONFIG.server.parcel;
           log(
@@ -91,4 +99,4 @@ if (module.id === '.') {
   });
 }
 
-module.exports = { install };
+module.exports = { install, run };

@@ -18,7 +18,7 @@ async function getDockerUrls() {
 
       if (shell.stdout) {
         const services = String(shell.stdout).split('\n').map(line => {
-          const [, name, port] = line.match(/_([^_]+?)_\d+.*?(\d+)->/) || [];
+          const [, name = '', port = ''] = line.match(/_([^_]+?)_\d+.*?(\d+)->/) || [];
           return { name, port };
         })
         .filter(service => service.port);
@@ -32,9 +32,10 @@ async function getDockerUrls() {
           const name = service.name.toUpperCase();
           const envKey = `${name}_URL`;
           env[`${name}_PORT`] = service.port;
+          const envValue = env[envKey];
 
-          if (env[envKey]) {
-            env[envKey] = env[envKey].replace(/:\d+\//, `:${service.port}/`);
+          if (envValue) {
+            env[envKey] = envValue.replace(/:\d+\//, `:${service.port}/`);
             log('docker', `${envKey}: ${env[envKey]}`);
           }
           else log('docker', `${service.name} port: ${service.port}`);

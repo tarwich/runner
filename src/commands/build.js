@@ -3,6 +3,7 @@ const { log } = require('../log');
 const { resolve } = require('path');
 
 const { env } = process;
+/** @type {import('config').Config} */
 let CONFIG;
 
 /**
@@ -23,6 +24,11 @@ function build(components = ['client', 'server']) {
   );
 }
 
+/**
+ * @param {import('commander').Command} program The Commander instance to add
+ * commands to
+ * @param {import('config').Config} config The runner configuration
+ */
 function install(program, config) {
   CONFIG = config;
   program.command('build [client|server...]')
@@ -31,6 +37,7 @@ function install(program, config) {
 }
 
 // If this module was run through fork()
+// @ts-ignore
 if (module.id === '.') {
   process.on('message', async({ CONFIG, action } = {}) => {
     try {

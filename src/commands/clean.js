@@ -41,6 +41,10 @@ async function clean(components) {
   }
 }
 
+/**
+ * @param {import('commander').Command} program The Commander instance to add
+ * commands to
+ */
 function install(program) {
   program.command('clean')
   .description('Remove the .cache and dist folders')

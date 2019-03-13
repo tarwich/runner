@@ -1,11 +1,12 @@
 /** @ts-enable */
-const CosmiConfig = require('cosmiconfig');
+const cosmiConfig = require('cosmiconfig');
 const { resolve } = require('path');
 const { defaultsDeep } = require('lodash');
 
-const explorer = new CosmiConfig('runner');
+const explorer = cosmiConfig('runner');
 const { config = {} } = explorer.searchSync() || {};
 
+/** @type {import('config').Config} */
 module.exports = {
   /** @type {string[]} */
   commandPath: [],
@@ -41,7 +42,7 @@ module.exports = {
 
 Object.assign(module.exports, defaultsDeep(config, module.exports));
 
-module.exports.commandPath = [].concat(
-  module.exports.commandPath,
-  resolve(__dirname, 'commands')
-);
+module.exports.commandPath =
+  (Array.isArray(module.exports.commandPath) ? module.exports.commandPath : [])
+  .concat(resolve(__dirname, 'commands'))
+;
