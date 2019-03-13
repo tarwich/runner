@@ -3,16 +3,31 @@ const { log } = require('../log');
 const { resolve } = require('path');
 
 const { env } = process;
+let CONFIG;
 
-function install(program, CONFIG) {
+/**
+ * Build the client and / or server
+ *
+ * @param {('client' | 'server')[]} components The components to build. Defaults
+ * to everything, but if you wnat to only build client or server, you may
+ * provide them here to restrict the process.
+ */
+function build(components = ['client', 'server']) {
+  if (components.length === 0) components = ['client', 'server'];
+  return Promise.all(
+    components.map(action => new Promise(resolve =>
+      fork(__filename, [], { env })
+      .on('exit', () => resolve())
+      .send({ CONFIG, action }))
+    )
+  );
+}
+
+function install(program, config) {
+  CONFIG = config;
   program.command('build [client|server...]')
   .description('Build the client and / or the server')
-  .action(components => {
-    if (components.length === 0) components = ['client', 'server'];
-    components.forEach(action => {
-      fork(__filename, [], { env }).send({ CONFIG, action });
-    });
-  });
+  .action(components => build(components).catch(console.error));
 }
 
 // If this module was run through fork()
@@ -53,4 +68,4 @@ if (module.id === '.') {
   });
 }
 
-module.exports = { install };
+module.exports = { install, build };

@@ -1,11 +1,32 @@
+// @ts-check
 const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
 
 const { env } = process;
+let CONFIG = {};
 
-function install(program, CONFIG) {
-  program.command('run [client|server...]')
+/**
+ * Run the server
+ *
+ * This function also builds and watches the server and client files. It is
+ * intended for development, not production. For production, you should call the
+ * generated files.
+ *
+ * @param {object} options See below
+ * @param {boolean} options.docker Enable detection of docker port
+ * @param {number | string} options.port Set the port on which the server will listen
+ */
+async function run(options) {
+  const { docker, port } = options;
+  fork(__filename, [], { env }).send({ CONFIG, action: 'client' });
+  env.PORT = String(port);
+  fork(__filename, [], { env }).send({ CONFIG, action: 'server', docker });
+}
+
+function install(program, config) {
+  CONFIG = config;
+  program.command('run')
   .description('Run the client and server with HMR')
   .option('--no-docker', 'Disable the docker detection')
   .option(
@@ -14,12 +35,7 @@ function install(program, CONFIG) {
     Number,
     env.PORT || 8080
   )
-  .action((components, options) => {
-    const { docker, port } = options;
-    fork(__filename, [], { env }).send({ CONFIG, action: 'client' });
-    env.PORT = port;
-    fork(__filename, [], { env }).send({ CONFIG, action: 'server', docker });
-  });
+  .action(options => run(options).catch(console.error));
 }
 
 // If this module was run through fork()

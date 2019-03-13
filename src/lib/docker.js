@@ -3,7 +3,7 @@ const { spawnSync } = require('child_process');
 
 const { env } = process;
 
-function getDockerUrls() {
+async function getDockerUrls() {
   if (!env.DOCKER) {
     {
       log('docker', 'Boot docker');
