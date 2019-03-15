@@ -23,6 +23,9 @@
     "@types/node": "11.13.5",
     "@types/parcel-bundler": "1.12.0",
     "@types/semver": "6.0.0",
+    "eslint-config-tarwich": "github:tarwich/eslint-config-tarwich",
+    "eslint": "5.15.1",
+    "globby": "9.1.0",
     "parcel-bundler": "1.12.3",
     "typescript": "3.4.3"
   },
