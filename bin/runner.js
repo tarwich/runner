@@ -10,8 +10,5 @@ const { args } = program.parse(process.argv);
 
 // If no command was found
 if (!args.find(arg => arg instanceof Command)) {
-  // If args were present, throw help
-  if (args.length) program.outputHelp();
-  // Otherwise run the default command
-  else program.parse(['run']);
+  program.outputHelp();
 }
