@@ -1,3 +1,5 @@
+import { ParcelOptions } from 'parcel-bundler';
+
 export declare interface Config {
   /** The path to additional command files */
   commandPath: string[];
@@ -5,14 +7,22 @@ export declare interface Config {
     /** The entry file for the client compilation */
     entry: string;
     /** The parcel configuration options */
-    parcel: object;
-  },
+    parcel: ParcelOptions;
+  };
   /** Arguments to add when running the server */
   runArguments: string[];
   server: {
     /** The entry file for the server compilation */
     entry: string;
     /** The parcel configuration options */
-    parcel: object;
-  }
+    parcel: ParcelOptions;
+  };
+  sources: {
+    /** Name to display in any output related to this source (optional) */
+    name: string;
+    /** The entry file for the server compilation */
+    entry: string;
+    /** The parcel configuration options */
+    parcel: ParcelOptions;
+  }[];
 }

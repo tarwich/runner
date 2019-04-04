@@ -23,7 +23,42 @@ a `.runnerrc.js` file, or any other method that `CosmiConfig` supports.
 
 [cosmiconfig]: https://www.npmjs.com/package/cosmiconfig
 
-### Commands
+### Build Command
+
+The build command will guess at configuration settings for client and server and
+build them. You can override this by setting the `client` or `server` entries in
+the config, or by adding an additional entry to `sources` in the config.
+
+The default configuration is:
+
+```json
+{
+  "sources": [
+    {
+      "name": "client",
+      "entry": "src/client/index.html",
+      "parcel": {
+        "cacheDir": "./.cache/client",
+        "outDir": "./dist/client",
+        "target": "browser",
+      },
+    },
+    {
+      "name": "server",
+      "entry": "src/server/index.js",
+      "parcel": {
+        "cacheDir": "./.cache/server",
+        "outDir": "./dist/server",
+        "outFile": "index.js",
+        "target": "node",
+        "minify": false,
+      },
+    }
+  ]
+}
+```
+
+### Additional Commands
 
 You can add your own commands to Runner by overriding `runner.commandPath` in
 your cosmiconfig, and adding .js files to that folder.
@@ -44,9 +79,10 @@ command. The `run` method is used when other commands want to run your command
 directly. It should return a Promise so that other commands can await the result
 of your command.
 
-[Commander]: https://www.npmjs.com/package/commander
+[commander]: https://www.npmjs.com/package/commander
 
 **Example**
+
 ```js
 function run() {
   console.log('This is the command!');
@@ -54,9 +90,10 @@ function run() {
 }
 
 function install(program) {
-  program.command('example')
-  .description('An example command')
-  .action(run);
+  program
+    .command('example')
+    .description('An example command')
+    .action(run);
 }
 
 module.exports = { install, run };

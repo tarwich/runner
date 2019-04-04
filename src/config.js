@@ -1,17 +1,14 @@
 /** @ts-enable */
 const cosmiConfig = require('cosmiconfig');
 const { resolve } = require('path');
-const { defaultsDeep } = require('lodash');
+const { defaultsDeep, reverse, uniqBy } = require('lodash');
 
 const explorer = cosmiConfig('runner');
 const { config = {} } = explorer.searchSync() || {};
 
 /** @type {import('config').Config} */
 module.exports = {
-  /** @type {string[]} */
   commandPath: [],
-  /** @type {string[]} */
-  commands: [],
   /** Options for building client */
   client: {
     entry: 'src/client/index.html',
@@ -23,8 +20,6 @@ module.exports = {
   },
   /**
    * Arguments to pass to run
-   *
-   * @type {string[]}
    */
   runArguments: [],
   /** Options for building server */
@@ -38,11 +33,23 @@ module.exports = {
       minify: false,
     },
   },
+  sources: [],
 };
 
 Object.assign(module.exports, defaultsDeep(config, module.exports));
 
-module.exports.commandPath =
-  (Array.isArray(module.exports.commandPath) ? module.exports.commandPath : [])
-  .concat(resolve(__dirname, 'commands'))
-;
+// Make sources[] override the hard-coded client/server
+module.exports.sources = uniqBy(
+  reverse(module.exports.sources)
+    .concat(
+      { ...module.exports.client, name: 'client' },
+      { ...module.exports.server, name: 'server' }
+    )
+    .map((item, i) => ({ name: `source${i + 1}`, ...item })),
+  'name'
+);
+
+module.exports.commandPath = (Array.isArray(module.exports.commandPath)
+  ? module.exports.commandPath
+  : []
+).concat(resolve(__dirname, 'commands'));
