@@ -20,6 +20,8 @@ export declare interface Config {
   sources: {
     /** Name to display in any output related to this source (optional) */
     name: string;
+    /** True if this item emits a runnable file */
+    run?: boolean;
     /** The entry file for the server compilation */
     entry: string;
     /** The parcel configuration options */

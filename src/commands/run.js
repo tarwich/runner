@@ -14,15 +14,20 @@ let CONFIG;
  * intended for development, not production. For production, you should call the
  * generated files.
  *
+ * @param {string[]} components The components to run (default: ['client',
+ * 'server'])
  * @param {object} options See below
  * @param {boolean} options.docker Enable detection of docker port
- * @param {number | string} options.port Set the port on which the server will listen
+ * @param {number | string} options.port Set the port on which the server will
+ * listen
  */
-async function run(options) {
+async function run(components, options) {
   const { docker, port } = options;
-  fork(__filename, [], { env }).send({ CONFIG, action: 'client' });
   env.PORT = String(port);
-  fork(__filename, [], { env }).send({ CONFIG, action: 'server', docker });
+  if (components.length === 0) components = ['client', 'server'];
+  components.forEach(component => {
+    fork(__filename, [], { env }).send({ CONFIG, action: component, docker });
+  });
 }
 
 /**
@@ -32,67 +37,62 @@ async function run(options) {
  */
 function install(program, config) {
   CONFIG = config;
-  program.command('run')
-  .description('Run the client and server with HMR')
-  .option('--no-docker', 'Disable the docker detection')
-  .option(
-    '--port <number>',
-    'The port number on which the server should listen',
-    Number,
-    env.PORT || 8080
-  )
-  .action(options => run(options).catch(console.error));
+  program
+    .command(`run [${config.sources.map(source => source.name).join('|')}...]`)
+    .description('Run the client and server with HMR')
+    .option('--no-docker', 'Disable the docker detection')
+    .option(
+      '--port <number>',
+      'The port number on which the server should listen',
+      Number,
+      env.PORT || 8080
+    )
+    .action((components, options) =>
+      run(components, options).catch(console.error)
+    );
 }
 
 // If this module was run through fork()
 // @ts-ignore
 if (module.id === '.') {
-  process.on('message', async({ CONFIG, action, docker } = {}) => {
+  process.on('message', async (options = {}) => {
+    /** @type {{CONFIG: import('config').Config, action: string, docker: boolean}} */
+    const { CONFIG, action, docker } = options;
+
     try {
-      if (action === 'client') {
-        log('build client', `Building ${CONFIG.client.entry}`);
+      const source = CONFIG.sources.find(item => item.name === action);
+      if (!source) console.error(`Source type ${action} invalid`);
+      else {
+        log(`run ${action}`, `Building ${source.entry}`);
         const Bundler = require('parcel-bundler');
 
-        const bundler = new Bundler(
-          resolve(CONFIG.client.entry),
-          {
-            ...CONFIG.client.parcel,
-            watch: true,
-          }
-        );
-        await bundler.bundle();
-      }
-
-      else if (action === 'server') {
-        log('build server', `Building ${CONFIG.server.entry}`);
-        const Bundler = require('parcel-bundler');
-
-        const bundler = new Bundler(
-          resolve(CONFIG.server.entry),
-          {
-            ... CONFIG.server.parcel,
-            watch: true
-          }
-        );
+        const bundler = new Bundler(resolve(source.entry), {
+          ...source.parcel,
+          watch: true,
+        });
+        const {
+          run,
+          parcel: { outDir },
+        } = source;
         // Get Docker information
         if (docker) require('../lib/docker').getDockerUrls();
         /** @type {import('child_process').ChildProcess} */
         let server;
-        // Run the server every time the build ends
-        bundler.on('buildEnd', () => {
-          const { outDir } = CONFIG.server.parcel;
-          log(
-            'run server',
-            `${server ? 'Restarting' : 'Starting'} server (${outDir})...`
-          );
-          if (server) server.kill();
-          server = fork(outDir, CONFIG.runArguments || [], { env });
-        });
+        if (run && outDir) {
+          // Run the server every time the build ends
+          bundler.on('buildEnd', () => {
+            log(
+              'run server',
+              `${server ? 'Restarting' : 'Starting'} server (${outDir})...`
+            );
+            if (server) server.kill();
+            server = fork(outDir, CONFIG.runArguments || [], { env });
+          });
+        }
         // Run the bundler
         bundler.bundle();
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error(error);
       process.exit(0);
     }
