@@ -1,3 +1,9 @@
+# 1.2.2
+
+## Fixed
+ * [`FIXED`]: Custom commands were not getting picked up
+ * [`FIXED`]: Docker was being run for everything
+
 # 1.2.1
 
 ## Fixed
