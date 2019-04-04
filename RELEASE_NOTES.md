@@ -1,3 +1,8 @@
+# 1.2.1
+
+## Fixed
+ * [`FIXED`]: Run did not repsect sources array
+
 # 1.2.0
 
 ## Added
