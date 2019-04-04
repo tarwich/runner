@@ -51,7 +51,11 @@ module.exports.sources = uniqBy(
   'name'
 );
 
-module.exports.commandPath = (Array.isArray(module.exports.commandPath)
-  ? module.exports.commandPath
-  : []
-).concat(resolve(__dirname, 'commands'));
+// Flatten and resolve all the command paths so that we can support receiving
+// commandPath as an array or a string
+module.exports.commandPath = []
+  // @ts-ignore (I can't figure out how to concat this without TypeScript
+  // complaining about never[])
+  .concat(module.exports.commandPath, resolve(__dirname, 'commands'))
+  .flat(1)
+  .map(/** @param {string} a */ a => resolve(a));
