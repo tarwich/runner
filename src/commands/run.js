@@ -24,7 +24,8 @@ let CONFIG;
 async function run(components, options) {
   const { docker, port } = options;
   env.PORT = String(port);
-  if (components.length === 0) components = ['client', 'server'];
+  if (components.length === 0)
+    components = CONFIG.sources.map(item => item.name);
   components.forEach(component => {
     fork(__filename, [], { env }).send({ CONFIG, action: component, docker });
   });
@@ -75,7 +76,7 @@ if (module.id === '.') {
           parcel: { outDir },
         } = source;
         // Get Docker information
-        if (docker) require('../lib/docker').getDockerUrls();
+        if (docker && source.docker) require('../lib/docker').getDockerUrls();
         /** @type {import('child_process').ChildProcess} */
         let server;
         if (run && outDir) {

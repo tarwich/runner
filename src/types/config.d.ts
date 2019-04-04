@@ -14,12 +14,16 @@ export declare interface Config {
   server: {
     /** The entry file for the server compilation */
     entry: string;
+    /** True if this entry utilizes docker */
+    docker: boolean;
     /** The parcel configuration options */
     parcel: ParcelOptions;
   };
   sources: {
     /** Name to display in any output related to this source (optional) */
     name: string;
+    /** True if this entry utilizes docker */
+    docker?: boolean;
     /** True if this item emits a runnable file */
     run?: boolean;
     /** The entry file for the server compilation */

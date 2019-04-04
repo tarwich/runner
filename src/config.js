@@ -25,6 +25,8 @@ module.exports = {
   /** Options for building server */
   server: {
     entry: 'src/server/index.js',
+    run: true,
+    docker: true,
     parcel: {
       cacheDir: './.cache/server',
       outDir: './dist/server',
