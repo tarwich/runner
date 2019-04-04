@@ -1,3 +1,8 @@
+# 1.2.0
+
+## Added
+ * [`ADDED`]: Changed build to allow extra sources
+
 # 1.1.0
 
 ## Added

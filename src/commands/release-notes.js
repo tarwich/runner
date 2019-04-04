@@ -86,7 +86,7 @@ async function run(options) {
         ([groupName, group]) =>
           `## ${groupName.replace(/(\w)/, c => c.toUpperCase())}\n` +
           group
-            .map(({ tag, message }) => ` * [${tag.toUpperCase()}]: ${message}`)
+            .map(({ tag, message }) => ` * [\`${tag.toUpperCase()}\`]: ${message}`)
             .join('\n')
       )
       .join('\n\n');
