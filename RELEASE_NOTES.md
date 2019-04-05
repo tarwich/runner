@@ -1,3 +1,12 @@
+# 1.3.0
+
+## Added
+ * [`ADDED`]: Release notes can add git tags
+ * [`ADDED`]: Now release notes use version in package.json instead of guessing from git tags
+
+## Fixed
+ * [`FIXED`]: Removced dependency on node 11.13
+
 # 1.2.2
 
 ## Fixed
