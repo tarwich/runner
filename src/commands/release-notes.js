@@ -1,20 +1,23 @@
 const { resolve } = require('path');
 const { existsSync, readFileSync, writeFileSync } = require('fs');
 const { spawnSync } = require('child_process');
-const { compare, inc } = require('semver');
+const { inc } = require('semver');
 const { env } = process;
-const { groupBy } = require('lodash');
+const { groupBy, uniq, upperFirst } = require('lodash');
 
+/** @type {{[key: string]: 'breaking' | 'added' | 'fixed'}} */
 const releaseTags = {
   breaking: 'breaking',
+
   feat: 'added',
   feature: 'added',
+
   fix: 'fixed',
   fixed: 'fixed',
-  hotfix: 'hotfix',
+  hotfix: 'fixed',
 };
 
-const tagOrder = ['breaking', 'added', 'fixed'];
+const tagOrder = uniq(Object.values(releaseTags));
 
 /**
  * Run a command and return the success text as a string
@@ -33,69 +36,104 @@ function shell(command, args) {
 }
 
 /**
+ * @return {{version: string, hash: string}} The current version string and the
+ * hash for this version to be used in git commit comparison
+ */
+function getCurrentVersion() {
+  const pkg = require(resolve('package.json'));
+
+  const { version = '0.0.1' } = pkg;
+  const hash =
+    shell('git', ['show-ref', '-s', version]) ||
+    shell('git', ['rev-list', '--max-parents=0', 'HEAD']);
+
+  return { version: version, hash };
+}
+
+/**
+ * @param {_.Dictionary<{ tag: "breaking" | "added" | "fixed"; message: string; }[]>} groups
+ */
+function getReleaseType(groups) {
+  if ('breaking' in groups) return 'major';
+  if ('added' in groups) return 'minor';
+  if ('fixed' in groups) return 'patch';
+}
+
+/**
  * Print release notes since the last release
  *
  * @param {object} options See below
  * @param {string} options.file The file to print release notes to. If this is
  * left blank, then the release notes will be printed to STDOUT.
  * @param {boolean} options.updatePackage Update the package.json
+ * @param {boolean} options.tag True if a git tag should be created
  */
 async function run(options) {
-  const tags = shell('git', ['tag', '-l']);
-  const [currentVersion = 'HEAD'] = tags
-    .split('\n')
-    .sort(compare)
-    .slice(-1);
-  const currentVersionHash = shell('git', ['rev-parse', currentVersion]);
+  const {
+    version: currentVersion,
+    hash: currentVersionHash,
+  } = getCurrentVersion();
   const logs = shell('git', [
     'log',
     '--pretty=%B',
     `${currentVersionHash}...HEAD`,
   ])
     .split('\n')
+    // Convert the lines into an array of tag and message objects
     .map(line => {
       const [, tag = '', message = ''] =
         line.match(/^\s*(\w+?)\s*:\s*(.*)\s*$/) || [];
       return {
-        // @ts-ignore
         tag: releaseTags[tag],
-        message: message,
+        message: upperFirst(message),
       };
     })
-    .filter(note => note.tag)
-    .sort((a, b) => {
-      const aa = tagOrder.indexOf(a.tag);
-      const bb = tagOrder.indexOf(b.tag);
-      return aa > bb ? 1 : aa < bb ? -1 : 0;
-    });
+    // Remove lines that do not contain a known tag
+    .filter(note => note.tag);
   const groups = groupBy(logs, 'tag');
-  const topGroup = Object.keys(groups)[0];
-  const newVersion = inc(
-    currentVersion,
-    // @ts-ignore
-    {
-      breaking: 'major',
-      added: 'minor',
-      fixed: 'patch',
-    }[topGroup]
-  );
+  const releaseType = getReleaseType(groups);
+  const newVersion = releaseType && inc(currentVersion, releaseType);
+  if (!newVersion) {
+    console.error('Unable to determine next version', {
+      currentVersion,
+      currentVersionHash,
+    });
+    process.exit(1);
+    return;
+  }
+  // Build the release notes
   const text =
     `# ${newVersion}\n\n` +
-    Object.entries(groups)
-      .map(
-        ([groupName, group]) =>
+    tagOrder
+      // Remove tags that don't exist in the current output
+      .filter(groupName => groups[groupName])
+      .map(groupName => {
+        const group = groups[groupName];
+        return (
           `## ${groupName.replace(/(\w)/, c => c.toUpperCase())}\n` +
           group
-            .map(({ tag, message }) => ` * [\`${tag.toUpperCase()}\`]: ${message}`)
+            .map(
+              ({ tag, message }) => ` * [\`${tag.toUpperCase()}\`]: ${message}`
+            )
             .join('\n')
-      )
+        );
+      })
       .join('\n\n');
 
+  // Create the tag if we were told to do so
+  if (options.tag) {
+    shell('git', ['tag', '-a', newVersion, '-m', `Release ${newVersion}`]);
+  }
+  // Update package.json if we were told to do so
   if (options.updatePackage) {
     const pkg = require(resolve('package.json'));
     pkg.version = newVersion;
-    writeFileSync(resolve('package.json'), JSON.stringify(pkg, null, '  '));
+    writeFileSync(
+      resolve('package.json'),
+      JSON.stringify(pkg, null, '  ') + '\n'
+    );
   }
+  // Output the notes to the console or a file
   if (options.file) {
     const file = resolve(options.file);
     const previousText = existsSync(file) ? readFileSync(file) : '';
@@ -113,6 +151,7 @@ function install(program) {
     .description('Print the release notes since the last release')
     .option('--file <file>', 'Write the release notes to the specified file')
     .option('--update-package', 'Update the package.json with the new version')
+    .option('--tag', 'Create a git tag')
     .action(options => run(options).catch(console.error));
 }
 
