@@ -1,7 +1,7 @@
 /** @ts-enable */
 const cosmiConfig = require('cosmiconfig');
 const { resolve } = require('path');
-const { defaultsDeep, reverse, uniqBy } = require('lodash');
+const { defaultsDeep, flatten, reverse, uniqBy } = require('lodash');
 
 const explorer = cosmiConfig('runner');
 const { config = {} } = explorer.searchSync() || {};
@@ -53,9 +53,9 @@ module.exports.sources = uniqBy(
 
 // Flatten and resolve all the command paths so that we can support receiving
 // commandPath as an array or a string
-module.exports.commandPath = []
-  // @ts-ignore (I can't figure out how to concat this without TypeScript
-  // complaining about never[])
-  .concat(module.exports.commandPath, resolve(__dirname, 'commands'))
-  .flat(1)
-  .map(/** @param {string} a */ a => resolve(a));
+module.exports.commandPath = flatten(
+  []
+    // @ts-ignore (I can't figure out how to concat this without TypeScript
+    // complaining about never[])
+    .concat(module.exports.commandPath, resolve(__dirname, 'commands'))
+).map(/** @param {string} a */ a => resolve(a));
