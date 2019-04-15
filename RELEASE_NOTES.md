@@ -1,3 +1,8 @@
+# 1.3.1
+
+## Fixed
+ * [`FIXED`]: Release notes unable to obtain version history
+
 # 1.3.0
 
 ## Added
