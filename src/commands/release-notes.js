@@ -11,6 +11,7 @@ const releaseTags = {
 
   feat: 'added',
   feature: 'added',
+  added: 'added',
 
   fix: 'fixed',
   fixed: 'fixed',
@@ -44,7 +45,7 @@ function getCurrentVersion() {
 
   const { version = '0.0.1' } = pkg;
   const hash =
-    shell('git', ['show-ref', '-s', version]) ||
+    shell('git', ['rev-list', '-1', version]) ||
     shell('git', ['rev-list', '--max-parents=0', 'HEAD']);
 
   return { version: version, hash };
@@ -84,7 +85,7 @@ async function run(options) {
       const [, tag = '', message = ''] =
         line.match(/^\s*(\w+?)\s*:\s*(.*)\s*$/) || [];
       return {
-        tag: releaseTags[tag],
+        tag: releaseTags[tag.toLowerCase()],
         message: upperFirst(message),
       };
     })
