@@ -142,6 +142,8 @@ async function run(options) {
     const previousText = existsSync(file) ? readFileSync(file) : '';
     writeFileSync(file, `${text}\n\n${previousText}`.trim());
   } else console.log(text);
+
+  shell('git', ['commit', '-am', `Release ${newVersion}`]);
 }
 
 /**
