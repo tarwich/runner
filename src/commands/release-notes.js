@@ -5,7 +5,7 @@ const { inc } = require('semver');
 const { env } = process;
 const { groupBy, uniq, upperFirst } = require('lodash');
 
-/** @type {{[key: string]: 'breaking' | 'added' | 'fixed'}} */
+/** @type {{[key: string]: 'breaking' | 'added' | 'fixed' | 'task'}} */
 const releaseTags = {
   breaking: 'breaking',
 
@@ -16,6 +16,8 @@ const releaseTags = {
   fix: 'fixed',
   fixed: 'fixed',
   hotfix: 'fixed',
+
+  task: 'task',
 };
 
 const tagOrder = uniq(Object.values(releaseTags));
@@ -52,12 +54,12 @@ function getCurrentVersion() {
 }
 
 /**
- * @param {_.Dictionary<{ tag: "breaking" | "added" | "fixed"; message: string; }[]>} groups
+ * @param {_.Dictionary<{ tag: "breaking" | "added" | "fixed" | "task"; message: string; }[]>} groups
  */
 function getReleaseType(groups) {
   if ('breaking' in groups) return 'major';
   if ('added' in groups) return 'minor';
-  if ('fixed' in groups) return 'patch';
+  return 'patch';
 }
 
 /**
