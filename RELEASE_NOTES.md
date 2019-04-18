@@ -1,3 +1,12 @@
+# 1.4.0
+
+## Added
+ * [`ADDED`]: Made release-notes commit the changed files
+ * [`ADDED`]: Allow task: tag in release notes
+
+## Task
+ * [`TASK`]: Update parcel-bundler and other non-essential packages
+
 # 1.3.1
 
 ## Fixed
