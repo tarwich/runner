@@ -1,3 +1,8 @@
+# 1.5.0
+
+## Added
+ * [`ADDED`]: Autodetect index.ts or index.js files in src/server
+
 # 1.4.0
 
 ## Added
