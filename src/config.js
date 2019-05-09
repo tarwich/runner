@@ -1,6 +1,7 @@
 /** @ts-enable */
 const cosmiConfig = require('cosmiconfig');
 const { resolve } = require('path');
+const { existsSync, readdirSync } = require('fs');
 const { defaultsDeep, flatten, reverse, uniqBy } = require('lodash');
 
 const explorer = cosmiConfig('runner');
@@ -37,6 +38,14 @@ module.exports = {
   },
   sources: [],
 };
+
+if (existsSync(resolve('src/server'))) {
+  const prefix = 'src/server';
+  const files = readdirSync(prefix).filter(file =>
+    /(?:index\.ts|index\.js)/.test(file)
+  );
+  if (files.length) module.exports.server.entry = `${prefix}/${files[0]}`;
+}
 
 Object.assign(module.exports, defaultsDeep(config, module.exports));
 
