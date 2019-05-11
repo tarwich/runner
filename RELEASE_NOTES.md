@@ -1,3 +1,8 @@
+## 1.6.0
+
+## Added
+ * [`ADDED`]: Action to update GitHub w\ release notes
+
 # 1.5.0
 
 ## Added
