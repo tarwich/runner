@@ -1,8 +1,7 @@
+const { shell } = require('../lib/shell');
 const { resolve } = require('path');
 const { existsSync, readFileSync, writeFileSync } = require('fs');
-const { spawnSync } = require('child_process');
 const { inc } = require('semver');
-const { env } = process;
 const { groupBy, uniq, upperFirst } = require('lodash');
 
 /** @type {{[key: string]: 'breaking' | 'added' | 'fixed' | 'task'}} */
@@ -23,63 +22,42 @@ const releaseTags = {
 const tagOrder = uniq(Object.values(releaseTags));
 
 /**
- * Run a command and return the success text as a string
- *
- * @param {string} command The command to run
- * @param {string[]} args Arguments to pass
+ * @param {string} notes
  */
-function shell(command, args) {
-  const child = spawnSync(command, args, {
-    env,
-    stdio: ['inherit', 'pipe', 'inherit'],
-  });
-
-  const text = child.stdout ? child.stdout.toString() : '';
-  return text.trim();
-}
-
-/**
- * @return {{version: string, hash: string}} The current version string and the
- * hash for this version to be used in git commit comparison
- */
-function getCurrentVersion() {
-  const pkg = require(resolve('package.json'));
-
-  const { version = '0.0.1' } = pkg;
-  const hash =
-    shell('git', ['rev-list', '-1', version]) ||
-    shell('git', ['rev-list', '--max-parents=0', 'HEAD']);
-
-  return { version: version, hash };
-}
-
-/**
- * @param {_.Dictionary<{ tag: "breaking" | "added" | "fixed" | "task"; message: string; }[]>} groups
- */
-function getReleaseType(groups) {
-  if ('breaking' in groups) return 'major';
-  if ('added' in groups) return 'minor';
+function getReleaseType(notes) {
+  const groups = notes
+  .toLowerCase()
+  .split('\n')
+  .map(line => (line.match(/## (\w+)/) || [])[1])
+  .filter(Boolean)
+  if (groups.includes('breaking')) return 'major';
+  if (groups.includes('added')) return 'minor';
   return 'patch';
 }
 
 /**
- * Print release notes since the last release
+ * @param {string} forVersion The version to build the release notes for
  *
- * @param {object} options See below
- * @param {string} options.file The file to print release notes to. If this is
- * left blank, then the release notes will be printed to STDOUT.
- * @param {boolean} options.updatePackage Update the package.json
- * @param {boolean} options.tag True if a git tag should be created
+ * @return {string}
  */
-async function run(options) {
-  const {
-    version: currentVersion,
-    hash: currentVersionHash,
-  } = getCurrentVersion();
+function buildReleaseNotes(forVersion) {
+  const tags = shell('git', ['tag', '--list'])
+    .split('\n')
+    .sort(new Intl.Collator(undefined).compare);
+  const previousVersion =
+    tags[
+      (tags.includes(forVersion) ? tags.indexOf(forVersion) : tags.length) - 1
+    ];
+
+  const currentVersionHash = shell('git', ['rev-list', '-1', forVersion]);
+  const previousVersionHash =
+    shell('git', ['rev-list', '-1', previousVersion]) ||
+    shell('git', ['rev-list', '--max-parents=0', 'HEAD']);
+
   const logs = shell('git', [
     'log',
     '--pretty=%B',
-    `${currentVersionHash}...HEAD`,
+    `${previousVersionHash}...${currentVersionHash}`,
   ])
     .split('\n')
     // Convert the lines into an array of tag and message objects
@@ -94,34 +72,49 @@ async function run(options) {
     // Remove lines that do not contain a known tag
     .filter(note => note.tag);
   const groups = groupBy(logs, 'tag');
-  const releaseType = getReleaseType(groups);
+  // Build the release notes
+  const text = tagOrder
+    // Remove tags that don't exist in the current output
+    .filter(groupName => groups[groupName])
+    .map(groupName => {
+      const group = groups[groupName];
+      return (
+        `## ${groupName.replace(/(\w)/, c => c.toUpperCase())}\n` +
+        group
+          .map(
+            ({ tag, message }) => ` * [\`${tag.toUpperCase()}\`]: ${message}`
+          )
+          .join('\n')
+      );
+    })
+    .join('\n\n');
+  return text;
+}
+
+/**
+ * Print release notes since the last release
+ *
+ * @param {object} options See below
+ * @param {string} options.file The file to print release notes to. If this is
+ * left blank, then the release notes will be printed to STDOUT.
+ * @param {boolean} options.updatePackage Update the package.json
+ * @param {boolean} options.tag True if a git tag should be created
+ */
+async function run(options) {
+  // Pull in any tags
+  shell('git', ['fetch', '--tags']);
+  // Get the current version
+  const pkg = require(resolve('package.json'));
+  const { version: currentVersion = '0.0.1' } = pkg;
+
+  const notes = buildReleaseNotes('HEAD');
+  const releaseType = getReleaseType(notes);
   const newVersion = releaseType && inc(currentVersion, releaseType);
   if (!newVersion) {
-    console.error('Unable to determine next version', {
-      currentVersion,
-      currentVersionHash,
-    });
+    console.error('Unable to determine next version', { currentVersion });
     process.exit(1);
     return;
   }
-  // Build the release notes
-  const text =
-    `# ${newVersion}\n\n` +
-    tagOrder
-      // Remove tags that don't exist in the current output
-      .filter(groupName => groups[groupName])
-      .map(groupName => {
-        const group = groups[groupName];
-        return (
-          `## ${groupName.replace(/(\w)/, c => c.toUpperCase())}\n` +
-          group
-            .map(
-              ({ tag, message }) => ` * [\`${tag.toUpperCase()}\`]: ${message}`
-            )
-            .join('\n')
-        );
-      })
-      .join('\n\n');
 
   // Create the tag if we were told to do so
   if (options.tag) {
@@ -136,14 +129,18 @@ async function run(options) {
       JSON.stringify(pkg, null, '  ') + '\n'
     );
   }
+  const text = `## ${newVersion}\n\n${notes}`;
+
   // Output the notes to the console or a file
   if (options.file) {
     const file = resolve(options.file);
     const previousText = existsSync(file) ? readFileSync(file) : '';
     writeFileSync(file, `${text}\n\n${previousText}`.trim());
+    // Commit the changes
+    shell('git', ['commit', '-am', `Release ${newVersion}`]);
+    // Show information about the release
+    console.log(shell('git', ['-P', 'log', '-n', '1', '-p', '--color']));
   } else console.log(text);
-
-  shell('git', ['commit', '-am', `Release ${newVersion}`]);
 }
 
 /**
@@ -160,4 +157,4 @@ function install(program) {
     .action(options => run(options).catch(console.error));
 }
 
-module.exports = { install };
+module.exports = { install, buildReleaseNotes, getReleaseType };

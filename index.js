@@ -1,7 +1,7 @@
 // @ts-check
 const { log } = require('./src/log');
 const { getDockerUrls } = require('./src/lib/docker');
-const { runCommand } = require('./src/lib/runCommand');
+const { runCommand } = require('./src/lib/run-command');
 // Commands to export
 const { build } = require('./src/commands/build');
 const { clean } = require('./src/commands/clean');

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 require('dotenv/config');
 const { Command } = require('commander');
-const { loadCommands } = require('../src/lib/loadCommands');
+const { loadCommands } = require('../src/lib/load-commands');
 
 const program = loadCommands();
 

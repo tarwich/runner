@@ -1,4 +1,4 @@
-const { loadCommands } = require('./loadCommands');
+const { loadCommands } = require('./load-commands');
 
 /**
  * Run a command as if it were run on the cli
