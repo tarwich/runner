@@ -4,7 +4,7 @@ const { jsonPath } = require('../lib/json-path');
 const { readFileSync } = require('fs');
 const { buildReleaseNotes } = require('../commands/release-notes');
 
-const { GITHUB_REPOSITORY = '' } = process.env;
+const { GITHUB_REPOSITORY = '', GITHUB_TOKEN } = process.env;
 
 /**
  * @param {string} query The GQL query to run
@@ -14,7 +14,7 @@ const gql = async (query, variables) => {
   return requestPromise('https://api.github.com/graphql', {
     method: 'POST',
     headers: {
-      Authorization: `bearer ${process.env.GITHUB_API_TOKEN}`,
+      Authorization: `bearer ${GITHUB_TOKEN}`,
       Accept: 'application/vnd.github.v3+json',
       'User-Agent': 'tarwich',
     },
@@ -47,7 +47,7 @@ async function main() {
     `https://api.github.com/repos/${OWNER}/${REPOSITORY}/releases`,
     {
       headers: {
-        Authorization: `bearer ${process.env.GITHUB_API_TOKEN}`,
+        Authorization: `bearer ${GITHUB_TOKEN}`,
         Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'tarwich',
       },
