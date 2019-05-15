@@ -8,10 +8,11 @@ const languages = require('linguist-languages');
 
 class Linter {
   constructor() {
+    this.name = '';
     const className = this.constructor.name;
 
     /** @param {any[]} rest */
-    this.log = (...rest) => console.log(`[${className}]`, ...rest);
+    this.log = (...rest) => console.log(`[${this.name || className}]`, ...rest);
   }
 
   /**
@@ -155,21 +156,34 @@ class caretLinter extends Linter {
 }
 
 class CustomLinter extends Linter {
-  constructor() {
+  /**
+   * @param {string} name Name of the custom linter
+   * @param {string} path Path to the .js file to run
+   */
+  constructor(name, path) {
     super();
-    this.enabled = lint.custom.length > 0;
+    this.name = name;
+    this.path = path;
+
+    this.enabled = Object.keys(lint.custom).length > 0;
+  }
+
+  static gather() {
+    return Object.keys(lint.custom).reduce(
+      (result, key) => ({
+        ...result,
+        [key]: new CustomLinter(key, lint.custom[key]),
+      }),
+      {}
+    );
   }
 
   run() {
-    this.log('Running custom linters...');
+    this.log(`Running custom "${this.name}" linter (${this.path})`);
 
-    return Promise.all(
-      lint.custom.map(async linter => {
-        return this.spawn('node', [resolve(linter)]).catch(error =>
-          Promise.reject(error)
-        );
-      })
-    ).then(array => array.filter(Boolean));
+    return this.spawn('node', [resolve(this.path)]).catch(error =>
+      Promise.reject(error)
+    );
   }
 }
 
@@ -266,9 +280,9 @@ class TSCLinter extends Linter {
 function gatherLinters() {
   const linters = {
     carets: new caretLinter(),
-    custom: new CustomLinter(),
     tsc: new TSCLinter(),
     prettier: new PrettierLinter(),
+    ...CustomLinter.gather(),
   };
 
   return linters;
