@@ -52,7 +52,7 @@ export declare interface Config {
       devDependencies: DependencyType;
     };
     /** Array of additional linters to run. Should be paths to .js files */
-    custom: {[key: string]: string};
+    custom: { [key: string]: string };
     /** Configuration settings for prettier */
     prettier: {
       /**

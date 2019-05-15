@@ -5,6 +5,7 @@ const { parse, resolve } = require('path');
 const { valid, validRange } = require('semver');
 const { lint } = require('../config');
 const languages = require('linguist-languages');
+const { flatten, flatMap } = require('lodash');
 
 class Linter {
   constructor() {
@@ -119,21 +120,19 @@ class caretLinter extends Linter {
       }
     };
 
-    const toCheck = [
+    const toCheck = flatten([
       caret.dependencies ? Object.entries(dependencies) : [],
       caret.devDependencies ? Object.entries(devDependencies) : [],
-    ]
-      .flat()
-      .filter(([name, version]) => validRange(version));
+    ]).filter(([name, version]) => validRange(version));
 
-    const results = [
+    const results = flatten([
       Object.entries(dependencies)
         .filter(([name, version]) => validRange(version))
         .map(getChecker('dependencies')),
       Object.entries(devDependencies)
         .filter(([name, version]) => validRange(version))
         .map(getChecker('devDependencies')),
-    ].flat();
+    ]);
 
     const problems = results.filter(entry => entry.problem);
 
@@ -218,9 +217,10 @@ class PrettierLinter extends Linter {
       languages.Markdown,
       languages.YAML,
     ];
-    const extensions = supportedLanguages
-      .flatMap(language => language.extensions || [])
-      .join(',');
+    const extensions = flatMap(
+      supportedLanguages,
+      language => language.extensions || []
+    ).join(',');
 
     lint.prettier.paths
       .map(path => path.replace('$EXTENSIONS', `*{${extensions}}`))
@@ -252,14 +252,14 @@ class TSCLinter extends Linter {
   recursiveSearch(path, filter) {
     if (parse(path).base === 'node_modules') return [];
 
-    const files = readdirSync(path)
-      .map(file => resolve(path, file))
-      .flatMap(file => {
+    const files = flatMap(
+      readdirSync(path).map(file => resolve(path, file)),
+      file => {
         if (statSync(file).isDirectory())
           return this.recursiveSearch(file, filter);
         else return file;
-      })
-      .filter(file => parse(file).base === filter);
+      }
+    ).filter(file => parse(file).base === filter);
 
     return files;
   }

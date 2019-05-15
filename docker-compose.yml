@@ -1,5 +1,10 @@
 version: '3'
 services:
+  node:
+    image: node:8
+    volumes:
+      - .:/var/app
+    working_dir: /var/app
   postgres:
     image: postgres
     ports: ['5432']

@@ -57,9 +57,9 @@
       "carets": {
         "dependencies": "range"
       },
-      "custom": [
-        "test/additional-lint.js"
-      ],
+      "custom": {
+        "custom": "test/additional-lint.js"
+      },
       "prettier": {
         "paths": [
           "$EXTENSIONS",

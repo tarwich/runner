@@ -1,6 +1,9 @@
 workflow "Update releases" {
+  resolves = [
+    "github release",
+    "Lint",
+  ]
   on = "push"
-  resolves = ["github release"]
 }
 
 action "npm install" {
@@ -16,4 +19,11 @@ action "github release" {
   runs = "node"
   args = "src/actions/github-release"
   secrets = ["GITHUB_TOKEN"]
+}
+
+action "Lint" {
+  uses = "docker://node:8"
+  needs = ["npm install"]
+  runs = "node"
+  args = "bin/runner lint"
 }
