@@ -1,5 +1,6 @@
 const https = require('https');
 const http = require('http');
+const { URL } = require('url');
 
 /**
  * Strip options from data and return options that are set in the data

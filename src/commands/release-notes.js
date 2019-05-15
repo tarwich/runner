@@ -26,10 +26,10 @@ const tagOrder = uniq(Object.values(releaseTags));
  */
 function getReleaseType(notes) {
   const groups = notes
-  .toLowerCase()
-  .split('\n')
-  .map(line => (line.match(/## (\w+)/) || [])[1])
-  .filter(Boolean)
+    .toLowerCase()
+    .split('\n')
+    .map(line => (line.match(/## (\w+)/) || [])[1])
+    .filter(Boolean);
   if (groups.includes('breaking')) return 'major';
   if (groups.includes('added')) return 'minor';
   return 'patch';
@@ -135,7 +135,7 @@ async function run(options) {
   if (options.file) {
     const file = resolve(options.file);
     const previousText = existsSync(file) ? readFileSync(file) : '';
-    writeFileSync(file, `${text}\n\n${previousText}`.trim());
+    writeFileSync(file, `${text}\n\n${previousText}`.trim() + '\n');
     // Commit the changes
     shell('git', ['commit', '-am', `Release ${newVersion}`]);
     // Show information about the release

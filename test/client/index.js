@@ -1,4 +1,3 @@
-/* global document */
 const root = document.querySelector('#root') ||
   document.body.appendChild(document.createElement('div'))
 ;

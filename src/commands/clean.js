@@ -1,6 +1,12 @@
 // @ts-check
 const { log } = require('../log');
-const { existsSync, statSync, readdirSync, rmdirSync, unlinkSync } = require('fs');
+const {
+  existsSync,
+  statSync,
+  readdirSync,
+  rmdirSync,
+  unlinkSync,
+} = require('fs');
 const { resolve } = require('path');
 
 /**
@@ -13,8 +19,7 @@ const rmrf = filePath => {
   else if (statSync(filePath).isDirectory()) {
     readdirSync(filePath).forEach(file => rmrf(resolve(filePath, file)));
     rmdirSync(filePath);
-  }
-  else unlinkSync(filePath);
+  } else unlinkSync(filePath);
 };
 
 /**
@@ -32,8 +37,7 @@ async function clean(components) {
       log('clean', `Removing dist/${component} ...`);
       rmrf(resolve('dist', component));
     });
-  }
-  else {
+  } else {
     log('clean', 'Removing .cache/...');
     rmrf('.cache');
     log('clean', 'Removing dist/...');
@@ -46,9 +50,10 @@ async function clean(components) {
  * commands to
  */
 function install(program) {
-  program.command('clean')
-  .description('Remove the .cache and dist folders')
-  .action(components => clean(components).catch(console.error));
+  program
+    .command('clean')
+    .description('Remove the .cache and dist folders')
+    .action(components => clean(components).catch(console.error));
 }
 
 module.exports = { clean, install, rmrf };

@@ -11,5 +11,5 @@ module.exports = {
   commands: { build, clean, run },
   getDockerUrls,
   log,
-  runCommand
+  runCommand,
 };

@@ -2,3 +2,7 @@ node_modules
 .cache
 dist
 .env
+
+# I'm not ready to commit to this...
+wallaby.conf.js
+wallaby.js

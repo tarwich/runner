@@ -1,5 +1,7 @@
 import { ParcelOptions } from 'parcel-bundler';
 
+export type DependencyType = 'strict' | 'range' | 'ignore';
+
 export declare interface Config {
   /** The path to additional command files */
   commandPath: string[];
@@ -31,4 +33,25 @@ export declare interface Config {
     /** The parcel configuration options */
     parcel: ParcelOptions;
   }[];
+  /** Rules for linters */
+  lint: {
+    carets: {
+      /**
+       * How to handle dependencies
+       * - strict: Must be a specific version such as 1.0.0
+       * - range: Must be a range such as ^1.0.0
+       * - ignore: Will not be checked
+       */
+      dependencies: DependencyType;
+      /**
+       * How to handle dependencies
+       * - strict: Must be a specific version such as 1.0.0
+       * - range: Must be a range such as ^1.0.0
+       * - ignore: Will not be checked
+       */
+      devDependencies: DependencyType;
+    };
+    /** Array of additional linters to run. Should be paths to .js files */
+    custom: string[];
+  };
 }

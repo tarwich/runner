@@ -37,6 +37,13 @@ module.exports = {
     },
   },
   sources: [],
+  lint: {
+    carets: {
+      dependencies: 'strict',
+      devDependencies: 'strict',
+    },
+    custom: [],
+  },
 };
 
 if (existsSync(resolve('src/server'))) {
