@@ -110,7 +110,6 @@ class caretLinter extends Linter {
 
       if (checkers[type]) return checkers[type];
       else {
-        // return Promise.reject(`Invalid type "${type}" for ${category}`);
         return /** @param {[string, string]} options */ ([name, version]) => ({
           name,
           version,
@@ -152,21 +151,6 @@ class caretLinter extends Linter {
           .join('\n')
       );
     }
-
-    // this.log(
-    //   `Checked ${toCheck.length} dependencies. Found ${
-    //     invalid.length
-    //   } dependencies which need carets fixed`
-    // );
-
-    // if (invalid.length)
-    //   return Promise.reject(
-    //     invalid
-    //       .map(([name, version]) => {
-    //         return `Found caret: ${name}: ${version}`;
-    //       })
-    //       .join('\n')
-    //   );
   }
 }
 
