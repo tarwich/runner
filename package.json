@@ -41,6 +41,7 @@
     "commander": "^2.20.0",
     "cosmiconfig": "^5.2.0",
     "dotenv": "^8.0.0",
+    "linguist-languages": "^7.4.0",
     "lodash": "^4.17.11"
   },
   "prettier": {
@@ -58,7 +59,15 @@
       },
       "custom": [
         "test/additional-lint.js"
-      ]
+      ],
+      "prettier": {
+        "paths": [
+          "$EXTENSIONS",
+          "bin/{,**/}$EXTENSIONS",
+          "src/{,**/}$EXTENSIONS",
+          "test/{,**/}$EXTENSIONS"
+        ]
+      }
     }
   }
 }

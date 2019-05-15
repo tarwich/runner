@@ -42,6 +42,9 @@ module.exports = {
       dependencies: 'strict',
       devDependencies: 'strict',
     },
+    prettier: {
+      paths: ['$EXTENSIONS', '{src,test,scripts}/{,**/}$EXTENSIONS'],
+    },
     custom: [],
   },
 };

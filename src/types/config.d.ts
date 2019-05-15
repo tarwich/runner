@@ -53,5 +53,14 @@ export declare interface Config {
     };
     /** Array of additional linters to run. Should be paths to .js files */
     custom: string[];
+    /** Configuration settings for prettier */
+    prettier: {
+      /**
+       * Paths to run prettier on. You can use $EXTENSIONS in the path to add
+       * all supported extensions, or you can add your own. This is an array of
+       * glob expressions.
+       */
+      paths: string[];
+    };
   };
 }

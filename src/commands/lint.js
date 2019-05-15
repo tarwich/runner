@@ -48,7 +48,7 @@ async function run(subcommands) {
   // Show all the errors
   if (errors.length) {
     errors.forEach(({ linter, error }) => {
-      console.error(`ERROR [${linter}]`.padEnd(80, '-'));
+      console.error(`\nERROR [${linter}]`.padEnd(80, '-'));
       console.error(`${error instanceof Error ? error.stack : error}\n\n`);
     });
   }

@@ -4,6 +4,7 @@ const { spawn } = require('child_process');
 const { parse, resolve } = require('path');
 const { valid, validRange } = require('semver');
 const { lint } = require('../config');
+const languages = require('linguist-languages');
 
 class Linter {
   constructor() {
@@ -192,12 +193,47 @@ class PrettierLinter extends Linter {
   constructor() {
     super();
 
+    this.languages = Object.keys(languages).reduce(
+      /** @param {keyof typeof languages} name */
+      (result, name) => ({
+        [name.toLowerCase()]: languages[name],
+      }),
+      {}
+    );
+
     this.command = this.resolveCommand('prettier');
     this.enabled = existsSync(this.command);
   }
 
   run() {
-    return this.spawn(this.command, ['--check', 'src/**', '*.js']);
+    const supportedLanguages = [
+      languages.JavaScript,
+      languages.JSX,
+      languages.Vue,
+      languages.TypeScript,
+      languages.CSS,
+      languages.Less,
+      languages.SCSS,
+      languages.HTML,
+      languages.JSON,
+      languages.GraphQL,
+      languages.Markdown,
+      languages.YAML,
+    ];
+    const extensions = supportedLanguages
+      .flatMap(language => language.extensions || [])
+      .join(',');
+
+    lint.prettier.paths
+      .map(path => path.replace('$EXTENSIONS', `*{${extensions}}`))
+      .forEach(path => this.log(`Checking ${path}`));
+
+    return this.spawn(this.command, [
+      '--check',
+      ...lint.prettier.paths.map(path =>
+        path.replace('$EXTENSIONS', `*{${extensions}}`)
+      ),
+    ]);
   }
 }
 
@@ -237,9 +273,7 @@ class TSCLinter extends Linter {
     return Promise.all(
       tsConfigFiles.map(file => {
         this.log(`Linting ${file}...`);
-        return this.spawn(this.command, ['--project', file, '--noEmit'], {
-          stdio: 'inherit',
-        }).catch(() => Promise.reject(`Linter for ${file} failed.`));
+        return this.spawn(this.command, ['--project', file, '--noEmit']);
       })
     ).then(array => array.filter(Boolean));
   }

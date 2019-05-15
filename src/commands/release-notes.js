@@ -79,11 +79,9 @@ function buildReleaseNotes(forVersion) {
     .map(groupName => {
       const group = groups[groupName];
       return (
-        `## ${groupName.replace(/(\w)/, c => c.toUpperCase())}\n` +
+        `## ${groupName.replace(/(\w)/, c => c.toUpperCase())}\n\n` +
         group
-          .map(
-            ({ tag, message }) => ` * [\`${tag.toUpperCase()}\`]: ${message}`
-          )
+          .map(({ tag, message }) => `- [\`${tag.toUpperCase()}\`]: ${message}`)
           .join('\n')
       );
     })
