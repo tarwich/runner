@@ -202,7 +202,7 @@ class PrettierLinter extends Linter {
     this.enabled = existsSync(this.command);
   }
 
-  run() {
+  async run() {
     const supportedLanguages = [
       languages.JavaScript,
       languages.JSX,
@@ -225,6 +225,9 @@ class PrettierLinter extends Linter {
     lint.prettier.paths
       .map(path => path.replace('$EXTENSIONS', `*{${extensions}}`))
       .forEach(path => this.log(`Checking ${path}`));
+
+    const version = await this.spawn(this.command, ['--version']);
+    this.log(`Version ${version}`);
 
     return this.spawn(this.command, [
       '--check',
