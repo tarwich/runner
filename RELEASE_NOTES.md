@@ -1,3 +1,9 @@
+## 1.7.1
+
+## Fixed
+
+- [`FIXED`]: Server wasn't detecting .ts files
+
 ## 1.7.0
 
 ## Added
