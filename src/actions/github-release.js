@@ -1,4 +1,4 @@
-require('../lib/env');
+require('dotenv/config');
 const requestPromise = require('request-promise-native');
 const { jsonPath } = require('../lib/json-path');
 const { readFileSync } = require('fs');

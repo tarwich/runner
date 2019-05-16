@@ -1,3 +1,10 @@
+## 1.7.0
+
+## Added
+
+- [`ADDED`]: Add a linter that auto-detects lints to run and runs them (#3)
+- [`ADDED`]: Added a linter that detects and runs appropriate lints for you
+
 ## 1.6.0
 
 ## Added
