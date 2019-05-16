@@ -137,7 +137,7 @@ async function run(options) {
     // Commit the changes
     shell('git', ['commit', '-am', `Release ${newVersion}`]);
     // Show information about the release
-    console.log(shell('git', ['-P', 'log', '-n', '1', '-p', '--color']));
+    console.log(shell('git', ['-P', 'log', '-n', '1', '-p']));
   } else console.log(text);
 }
 
