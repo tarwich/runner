@@ -1,3 +1,9 @@
+## 1.7.2
+
+## Fixed
+
+- [`FIXED`]: Move globby to a dependency
+
 ## 1.7.1
 
 ## Fixed
