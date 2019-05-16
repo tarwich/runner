@@ -42,7 +42,7 @@
     "commander": "^2.20.0",
     "cosmiconfig": "^5.2.0",
     "dotenv": "^8.0.0",
-    "globby": "9.2.0",
+    "globby": "^9.2.0",
     "linguist-languages": "^7.4.0",
     "lodash": "^4.17.11"
   },
