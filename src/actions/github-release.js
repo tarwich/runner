@@ -45,7 +45,7 @@ async function main() {
 
   if (release) {
     console.log(`Release for "${version}" already created. Ignoring.`);
-    return;
+    process.exit(78);
   }
 
   const notes = `## ${version}\n\n${buildReleaseNotes('HEAD')}`;
