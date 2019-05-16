@@ -17,11 +17,14 @@ async function getDockerUrls() {
       log('docker', String(shell.stderr));
 
       if (shell.stdout) {
-        const services = String(shell.stdout).split('\n').map(line => {
-          const [, name = '', port = ''] = line.match(/_([^_]+?)_\d+.*?(\d+)->/) || [];
-          return { name, port };
-        })
-        .filter(service => service.port);
+        const services = String(shell.stdout)
+          .split('\n')
+          .map(line => {
+            const [, name = '', port = ''] =
+              line.match(/_([^_]+?)_\d+.*?(\d+)->/) || [];
+            return { name, port };
+          })
+          .filter(service => service.port);
 
         // Add a fake service to the front of the array to handle a generic
         // DATABASE_URL
@@ -37,8 +40,7 @@ async function getDockerUrls() {
           if (envValue) {
             env[envKey] = envValue.replace(/:\d+\//, `:${service.port}/`);
             log('docker', `${envKey}: ${env[envKey]}`);
-          }
-          else log('docker', `${service.name} port: ${service.port}`);
+          } else log('docker', `${service.name} port: ${service.port}`);
         });
       }
     }

@@ -14,6 +14,8 @@ let CONFIG;
  * provide them here to restrict the process.
  */
 function build(components = []) {
+  // There's a scenario where config doesn't exist and needs imported
+  if (!CONFIG) CONFIG = require('../config');
   if (components.length === 0)
     components = CONFIG.sources.map(source => source.name);
   return Promise.all(

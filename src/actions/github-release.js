@@ -4,7 +4,7 @@ const { jsonPath } = require('../lib/json-path');
 const { readFileSync } = require('fs');
 const { buildReleaseNotes } = require('../commands/release-notes');
 
-const { GITHUB_REPOSITORY = '', GITHUB_TOKEN } = process.env;
+const { GITHUB_REF, GITHUB_REPOSITORY = '', GITHUB_TOKEN } = process.env;
 
 /**
  * @param {string} query The GQL query to run
@@ -23,6 +23,12 @@ const gql = async (query, variables) => {
 };
 
 async function main() {
+  // Only run on master branch
+  if (GITHUB_REF !== 'refs/heads/master') {
+    console.log('Not on master branch');
+    process.exit(0);
+  }
+
   const [OWNER, REPOSITORY] = GITHUB_REPOSITORY.split('/');
   const { version } = JSON.parse(readFileSync('package.json', 'utf-8'));
 

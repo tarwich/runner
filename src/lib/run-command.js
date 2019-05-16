@@ -9,10 +9,7 @@ const { loadCommands } = require('./load-commands');
  */
 function runCommand(command, args = []) {
   const program = loadCommands();
-  program.parse([
-    command,
-    ...args
-  ]);
+  program.parse([command, ...args]);
 }
 
 module.exports = { runCommand };

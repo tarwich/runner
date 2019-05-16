@@ -37,6 +37,16 @@ module.exports = {
     },
   },
   sources: [],
+  lint: {
+    carets: {
+      dependencies: 'strict',
+      devDependencies: 'strict',
+    },
+    prettier: {
+      paths: ['$EXTENSIONS', '{src,test,scripts}/{,**/}$EXTENSIONS'],
+    },
+    custom: [],
+  },
 };
 
 if (existsSync(resolve('src/server'))) {

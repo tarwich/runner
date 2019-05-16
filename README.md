@@ -29,32 +29,70 @@ The build command will guess at configuration settings for client and server and
 build them. You can override this by setting the `client` or `server` entries in
 the config, or by adding an additional entry to `sources` in the config.
 
-The default configuration is:
+Configuration documentation:
 
-```json
+```ts
 {
-  "sources": [
-    {
-      "name": "client",
-      "entry": "src/client/index.html",
-      "parcel": {
-        "cacheDir": "./.cache/client",
-        "outDir": "./dist/client",
-        "target": "browser",
-      },
-    },
-    {
-      "name": "server",
-      "entry": "src/server/index.js",
-      "parcel": {
-        "cacheDir": "./.cache/server",
-        "outDir": "./dist/server",
-        "outFile": "index.js",
-        "target": "node",
-        "minify": false,
-      },
-    }
-  ]
+  /** The path to additional command files */
+  commandPath: string[];
+  client: {
+    /** The entry file for the client compilation */
+    entry: string;
+    /** The parcel configuration options */
+    parcel: ParcelOptions;
+  };
+  /** Arguments to add when running the server */
+  runArguments: string[];
+  server: {
+    /** The entry file for the server compilation */
+    entry: string;
+    /** True if this entry utilizes docker */
+    docker: boolean;
+    /** The parcel configuration options */
+    parcel: ParcelOptions;
+  };
+  sources: {
+    /** Name to display in any output related to this source (optional) */
+    name: string;
+    /** True if this entry utilizes docker */
+    docker?: boolean;
+    /** True if this item emits a runnable file */
+    run?: boolean;
+    /** The entry file for the server compilation */
+    entry: string;
+    /** The parcel configuration options */
+    parcel: ParcelOptions;
+  }[];
+  /** Rules for linters */
+  lint: {
+    carets: {
+      /**
+       * How to handle dependencies
+       * - strict: Must be a specific version such as 1.0.0
+       * - range: Must be a range such as ^1.0.0
+       * - ignore: Will not be checked
+       */
+      dependencies: DependencyType;
+      /**
+       * How to handle dependencies
+       * - strict: Must be a specific version such as 1.0.0
+       * - range: Must be a range such as ^1.0.0
+       * - ignore: Will not be checked
+       */
+      devDependencies: DependencyType;
+    };
+    /** Array of additional linters to run. Should be paths to .js files */
+    custom: string[];
+    /** Configuration settings for prettier */
+    prettier: {
+      /**
+       * Paths to run prettier on. You can use $EXTENSIONS in the path to add
+       * all supported extensions, or you can add your own. This is an array of
+       * glob expressions.
+       */
+      paths: string[];
+    };
+  };
 }
 ```
 

@@ -1,5 +1,7 @@
 import { ParcelOptions } from 'parcel-bundler';
 
+export type DependencyType = 'strict' | 'range' | 'ignore';
+
 export declare interface Config {
   /** The path to additional command files */
   commandPath: string[];
@@ -31,4 +33,34 @@ export declare interface Config {
     /** The parcel configuration options */
     parcel: ParcelOptions;
   }[];
+  /** Rules for linters */
+  lint: {
+    carets: {
+      /**
+       * How to handle dependencies
+       * - strict: Must be a specific version such as 1.0.0
+       * - range: Must be a range such as ^1.0.0
+       * - ignore: Will not be checked
+       */
+      dependencies: DependencyType;
+      /**
+       * How to handle dependencies
+       * - strict: Must be a specific version such as 1.0.0
+       * - range: Must be a range such as ^1.0.0
+       * - ignore: Will not be checked
+       */
+      devDependencies: DependencyType;
+    };
+    /** Array of additional linters to run. Should be paths to .js files */
+    custom: { [key: string]: string };
+    /** Configuration settings for prettier */
+    prettier: {
+      /**
+       * Paths to run prettier on. You can use $EXTENSIONS in the path to add
+       * all supported extensions, or you can add your own. This is an array of
+       * glob expressions.
+       */
+      paths: string[];
+    };
+  };
 }
