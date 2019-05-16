@@ -1,7 +1,6 @@
 /** @ts-enable */
 const cosmiConfig = require('cosmiconfig');
 const { resolve } = require('path');
-const { existsSync, readdirSync } = require('fs');
 const { defaultsDeep, flatten, reverse, uniqBy } = require('lodash');
 const { sync: glob } = require('globby');
 
