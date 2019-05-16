@@ -1,5 +1,5 @@
 require('../lib/env');
-const { requestPromise } = require('../lib/http');
+const requestPromise = require('request-promise-native');
 const { jsonPath } = require('../lib/json-path');
 const { readFileSync } = require('fs');
 const { buildReleaseNotes } = require('../commands/release-notes');
