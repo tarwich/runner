@@ -9,25 +9,37 @@ let CONFIG;
 /**
  * Build the client and / or server
  *
- * @param {string[]} components The components to build. Defaults
- * to everything, but if you wnat to only build client or server, you may
- * provide them here to restrict the process.
+ * @param {string[]} components The components to build. Defaults to everything,
+ * but if you wnat to only build client or server, you may provide them here to
+ * restrict the process.
+ * @param {object} options See below
+ * @param {boolean} options.series Build each item in series instead of parallel
  */
-function build(components = []) {
+async function build(components = [], options) {
   // There's a scenario where config doesn't exist and needs imported
   if (!CONFIG) CONFIG = require('../config');
   if (components.length === 0)
     components = CONFIG.sources.map(source => source.name);
-  return Promise.all(
-    components.map(
-      action =>
-        new Promise(resolve =>
-          fork(__filename, [], { env })
-            .on('exit', () => resolve())
-            .send({ CONFIG, action })
-        )
-    )
-  );
+
+  /**
+   * @param {string} component The component to build
+   * @return Promise<void>
+   */
+  function buildComponent(component) {
+    return new Promise(resolve =>
+      fork(__filename, [], { env })
+        .on('exit', () => resolve())
+        .send({ CONFIG, action: component })
+    );
+  }
+
+  if (options.series) {
+    const result = [];
+    for (const component of components) {
+      result.push(await buildComponent(component));
+    }
+    return result;
+  } else return Promise.all(components.map(buildComponent));
 }
 
 /**
@@ -39,8 +51,14 @@ function install(program, config) {
   CONFIG = config;
   program
     .command(`build [${config.sources.map(s => s.name).join('|')}...]`)
+    .option(
+      '--series',
+      'Build all the options one at a time instead of in parallel'
+    )
     .description('Build the client and / or the server')
-    .action(components => build(components).catch(console.error));
+    .action((components, options) =>
+      build(components, options).catch(console.error)
+    );
 }
 
 // If this module was run through fork()

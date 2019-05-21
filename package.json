@@ -55,6 +55,9 @@
     "client": {
       "entry": "test/client/index.html"
     },
+    "server": {
+      "entry": "test/server/index.js"
+    },
     "lint": {
       "carets": {
         "dependencies": "range"
