@@ -1,3 +1,9 @@
+## 1.8.0
+
+## Added
+
+- [`ADDED`]: Implemented --series in build command
+
 ## 1.7.2
 
 ## Fixed
