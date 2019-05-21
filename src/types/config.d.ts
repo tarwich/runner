@@ -24,9 +24,9 @@ export declare interface Config {
   sources: {
     /** Name to display in any output related to this source (optional) */
     name: string;
-    /** True if this entry utilizes docker */
+    /** True if this entry utilizes docker (default: false) */
     docker?: boolean;
-    /** True if this item emits a runnable file */
+    /** True if this item emits a runnable file (default: false) */
     run?: boolean;
     /** The entry file for the server compilation */
     entry: string;
