@@ -1,3 +1,9 @@
+## 1.8.1
+
+## Fixed
+
+- [`FIXED`]: Cannot read series of undefined
+
 ## 1.8.0
 
 ## Added
