@@ -15,7 +15,7 @@ let CONFIG;
  * @param {object} options See below
  * @param {boolean} options.series Build each item in series instead of parallel
  */
-async function build(components = [], options) {
+async function build(components = [], options = { series: false }) {
   // There's a scenario where config doesn't exist and needs imported
   if (!CONFIG) CONFIG = require('../config');
   if (components.length === 0)
