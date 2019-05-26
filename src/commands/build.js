@@ -1,6 +1,7 @@
 const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
+const { existsSync } = require('fs');
 
 const { env } = process;
 /** @type {import('config').Config} */
@@ -74,6 +75,21 @@ if (module.id === '.') {
       else {
         log(`build ${action}`, `Building ${source.entry}`);
         const Bundler = require('parcel-bundler');
+
+        // In cases where defaulted sources exists (ie - client and server), this let's there be an explicit
+        // opt-out of the source to prevent extra processing or conflict with existing project structure that
+        // should not be processed
+        if (source.ignore) {
+          console.log('Skipping source', source.name);
+          return;
+        }
+
+        // Do an explicit check before letting the bundler perform it's task to prevent empty folders
+        // from showing up. This way we can support keeping client and server defaulted to values, but not
+        // have them clutter the distribution with empty folders when they are not requested.
+        if (!existsSync(resolve(source.entry))) {
+          throw new Error(`No entries found at ${resolve(source.entry)}`);
+        }
 
         if (CONFIG) {
           const bundler = new Bundler(resolve(source.entry), source.parcel);

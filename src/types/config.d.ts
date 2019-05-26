@@ -30,6 +30,8 @@ export declare interface Config {
     run?: boolean;
     /** The entry file for the server compilation */
     entry: string;
+    /** When set to true, this source is skipped. This allows for explicit removal of default sources that may exist. */
+    ignore?: boolean;
     /** The parcel configuration options */
     parcel: ParcelOptions;
   }[];
