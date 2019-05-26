@@ -1,9 +1,16 @@
 const { log } = require('../log');
 const { spawnSync } = require('child_process');
+const { sync: globSync } = require('globby');
+const { resolve } = require('path');
 
 const { env } = process;
 
 async function getDockerUrls() {
+  if (!globSync(resolve('docker-compose.yml')).length) {
+    env.DOCKER = 'ignore';
+    log('docker', 'No docker-compose.yml. Not running docker');
+  }
+
   if (!env.DOCKER) {
     {
       log('docker', 'Boot docker');
