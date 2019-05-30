@@ -49,7 +49,7 @@ module.exports = {
   },
 };
 
-const files = glob('src/server/index.{tsx,ts,jsx,js}');
+const files = glob('{src/,}server/index.{tsx,ts,jsx,js}');
 if (files.length) module.exports.server.entry = files[0];
 
 Object.assign(module.exports, defaultsDeep(config, module.exports));
