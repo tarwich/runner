@@ -1,3 +1,11 @@
+## 1.9.0
+
+## Added
+
+- [`ADDED`]: Allow --production flag to be set to enable minification (#7)
+- [`ADDED`]: Check for docker-compose.yml, and don't run docker unless one is found
+- [`ADDED`]: Allow finding server and client folders in project root
+
 ## 1.8.1
 
 ## Fixed
