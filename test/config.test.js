@@ -108,7 +108,7 @@ describe('Config', () => {
     };
 
     mockFs({
-      'client': files,
+      client: files,
       'src/client': files,
       'package.json': PACKAGE_JSON,
     });
