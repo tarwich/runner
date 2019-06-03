@@ -22,7 +22,6 @@
   "devDependencies": {
     "@types/chai": "4.1.7",
     "@types/cosmiconfig": "5.0.3",
-    "@types/joi": "14.3.3",
     "@types/lodash": "4.14.126",
     "@types/mocha": "5.2.6",
     "@types/mock-fs": "3.6.30",
@@ -34,7 +33,6 @@
     "chalk": "2.4.2",
     "eslint": "5.16.0",
     "eslint-config-tarwich": "github:tarwich/eslint-config-tarwich",
-    "joi": "14.3.1",
     "mocha": "6.1.4",
     "mock-fs": "4.10.0",
     "parcel-bundler": "1.12.3",
@@ -47,8 +45,7 @@
     "commander": "^2.20.0",
     "cosmiconfig": "^5.2.0",
     "dotenv": "^8.0.0",
-    "glob": "7.1.4",
-    "globby": "^9.2.0",
+    "glob": "^7.1.4",
     "linguist-languages": "^7.4.0",
     "lodash": "^4.17.11"
   },
