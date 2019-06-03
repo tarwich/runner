@@ -10,32 +10,10 @@ const { config = {} } = explorer.searchSync() || {};
 /** @type {import('config').Config} */
 module.exports = {
   commandPath: [],
-  /** Options for building client */
-  client: {
-    entry: 'src/client/index.html',
-    parcel: {
-      cacheDir: './.cache/client',
-      outDir: './dist/client',
-      target: 'browser',
-    },
-  },
   /**
    * Arguments to pass to run
    */
   runArguments: [],
-  /** Options for building server */
-  server: {
-    entry: 'src/server/index.js',
-    run: true,
-    docker: true,
-    parcel: {
-      cacheDir: './.cache/server',
-      outDir: './dist/server',
-      outFile: 'index.js',
-      target: 'node',
-      minify: false,
-    },
-  },
   sources: [],
   lint: {
     carets: {
@@ -49,8 +27,41 @@ module.exports = {
   },
 };
 
-const files = glob('{src/,}server/index.{tsx,ts,jsx,js}');
-if (files.length) module.exports.server.entry = files[0];
+// Autodetect the client. We search src/, test/ and the root for a client folder
+// "test/" is included for library building scenarios.
+const clientFiles = glob('{src/,test/,}client/index.{html,tsx,ts,jsx,js}');
+
+if (clientFiles.length) {
+  module.exports.sources.push({
+    name: 'client',
+    entry: clientFiles[0],
+    parcel: {
+      cacheDir: './.cache/client',
+      outDir: './dist/client',
+      target: 'browser',
+    },
+  });
+}
+
+// Autodetect the server. We search src/, test/ and the root for a server folder
+// "test/" is included for library building scenarios.
+const serverFiles = glob('{src/,test/,}server/index.{html,tsx,ts,jsx,js}');
+
+if (serverFiles.length) {
+  module.exports.sources.push({
+    name: 'server',
+    entry: serverFiles[0],
+    run: true,
+    docker: true,
+    parcel: {
+      cacheDir: './.cache/server',
+      outDir: './dist/server',
+      outFile: 'index.js',
+      target: 'node',
+      minify: false,
+    },
+  });
+}
 
 Object.assign(module.exports, defaultsDeep(config, module.exports));
 

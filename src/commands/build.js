@@ -87,17 +87,8 @@ if (module.id === '.') {
         log(`build ${action}`, `Building ${source.entry}`);
         const Bundler = require('parcel-bundler');
 
-        // In cases where defaulted sources exists (ie - client and server), this let's there be an explicit
-        // opt-out of the source to prevent extra processing or conflict with existing project structure that
-        // should not be processed
-        if (source.ignore) {
-          console.log('Skipping source', source.name);
-          return;
-        }
-
         // Do an explicit check before letting the bundler perform it's task to prevent empty folders
-        // from showing up. This way we can support keeping client and server defaulted to values, but not
-        // have them clutter the distribution with empty folders when they are not requested.
+        // from showing up. Even when files do not exist, the bundler has a tendency to make empty directories.
         if (!existsSync(resolve(source.entry))) {
           throw new Error(`No entries found at ${resolve(source.entry)}`);
         }

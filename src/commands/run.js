@@ -64,14 +64,6 @@ if (module.id === '.') {
       const source = CONFIG.sources.find(item => item.name === action);
       if (!source) console.error(`Source type ${action} invalid`);
       else {
-        // In cases where defaulted sources exists (ie - client and server), this let's there be an explicit
-        // opt-out of the source to prevent extra processing or conflict with existing project structure that
-        // should not be processed
-        if (source.ignore) {
-          console.log('Skipping source', source.name);
-          return;
-        }
-
         log(`run ${action}`, `Building ${source.entry}`);
         const Bundler = require('parcel-bundler');
 
