@@ -23,6 +23,27 @@ a `.runnerrc.js` file, or any other method that `CosmiConfig` supports.
 
 [cosmiconfig]: https://www.npmjs.com/package/cosmiconfig
 
+### File autodetection
+
+Runner will attempt to autodetect client and server files for you. The order of
+precedence for these files is:
+
+#### Client
+
+- src/client/index.html
+- src/client/index.htm
+- src/client/index.ts
+- src/client/index.js
+- client/index.html
+- client/index.htm
+- client/index.ts
+- client/index.js
+
+- src/server/index.ts
+- src/server/index.js
+- server/index.ts
+- server/index.js
+
 ### Build Command
 
 The build command will guess at configuration settings for client and server and
@@ -35,32 +56,18 @@ Configuration documentation:
 {
   /** The path to additional command files */
   commandPath: string[];
-  client: {
-    /** The entry file for the client compilation */
-    entry: string;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  };
   /** Arguments to add when running the server */
   runArguments: string[];
-  server: {
-    /** The entry file for the server compilation */
-    entry: string;
-    /** True if this entry utilizes docker */
-    docker: boolean;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  };
   sources: {
     /** Name to display in any output related to this source (optional) */
     name: string;
-    /** True if this entry utilizes docker */
+    /** True if this entry utilizes docker (default: false) */
     docker?: boolean;
-    /** True if this item emits a runnable file */
+    /** True if this item emits a runnable file (default: false) */
     run?: boolean;
     /** The entry file for the server compilation */
     entry: string;
-    /** The parcel configuration options */
+    /** The parcel configuration options (https://parceljs.org/api.html) */
     parcel: ParcelOptions;
   }[];
   /** Rules for linters */

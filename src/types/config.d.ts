@@ -5,22 +5,8 @@ export type DependencyType = 'strict' | 'range' | 'ignore';
 export declare interface Config {
   /** The path to additional command files */
   commandPath: string[];
-  client: {
-    /** The entry file for the client compilation */
-    entry: string;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  };
   /** Arguments to add when running the server */
   runArguments: string[];
-  server: {
-    /** The entry file for the server compilation */
-    entry: string;
-    /** True if this entry utilizes docker */
-    docker: boolean;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  };
   sources: {
     /** Name to display in any output related to this source (optional) */
     name: string;
@@ -30,9 +16,7 @@ export declare interface Config {
     run?: boolean;
     /** The entry file for the server compilation */
     entry: string;
-    /** When set to true, this source is skipped. This allows for explicit removal of default sources that may exist. */
-    ignore?: boolean;
-    /** The parcel configuration options */
+    /** The parcel configuration options (https://parceljs.org/api.html) */
     parcel: ParcelOptions;
   }[];
   /** Rules for linters */

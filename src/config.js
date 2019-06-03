@@ -1,9 +1,6 @@
-/** @ts-enable */
-const cosmiConfig = require('cosmiconfig');
-const { resolve } = require('path');
-const { defaultsDeep, flatten, reverse, uniqBy } = require('lodash');
-const { sync: glob } = require('globby');
+const { loadConfig } = require('./load-config');
 
+<<<<<<< HEAD
 const explorer = cosmiConfig('runner');
 const { config = {} } = explorer.searchSync() || {};
 
@@ -84,3 +81,7 @@ module.exports.commandPath = flatten(
     // complaining about never[])
     .concat(module.exports.commandPath, resolve(__dirname, 'commands'))
 ).map(/** @param {string} a */ a => resolve(a));
+=======
+/** @type {import('config').Config } */
+module.exports = loadConfig();
+>>>>>>> fc9ce7a89873412a8c76ff6fb5c48118b31fec2b
