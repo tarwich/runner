@@ -2,37 +2,27 @@ import { ParcelOptions } from 'parcel-bundler';
 
 export type DependencyType = 'strict' | 'range' | 'ignore';
 
+export declare interface Source {
+  /** Name to display in any output related to this source (optional) */
+  name: string;
+  /** True if this entry utilizes docker (default: false) */
+  docker?: boolean;
+  /** True if this item emits a runnable file (default: false) */
+  run?: boolean;
+  /** The entry file for the server compilation */
+  entry: string;
+  /** The parcel configuration options */
+  parcel: ParcelOptions;
+}
+
 export declare interface Config {
   /** The path to additional command files */
   commandPath: string[];
-  client: {
-    /** The entry file for the client compilation */
-    entry: string;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  };
+  client: Partial<Source>;
   /** Arguments to add when running the server */
   runArguments: string[];
-  server: {
-    /** The entry file for the server compilation */
-    entry: string;
-    /** True if this entry utilizes docker */
-    docker: boolean;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  };
-  sources: {
-    /** Name to display in any output related to this source (optional) */
-    name: string;
-    /** True if this entry utilizes docker (default: false) */
-    docker?: boolean;
-    /** True if this item emits a runnable file (default: false) */
-    run?: boolean;
-    /** The entry file for the server compilation */
-    entry: string;
-    /** The parcel configuration options */
-    parcel: ParcelOptions;
-  }[];
+  server: Partial<Source>;
+  sources: Partial<Source>[];
   /** Rules for linters */
   lint: {
     carets: {
