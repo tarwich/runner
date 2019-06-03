@@ -1,6 +1,7 @@
 const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
+const { nonEmptyString } = require('../lib/type-guards');
 
 const { env } = process;
 /** @type {import('config').Config} */
@@ -26,7 +27,9 @@ async function build(
   // There's a scenario where config doesn't exist and needs imported
   if (!CONFIG) CONFIG = require('../config');
   if (components.length === 0)
-    components = CONFIG.sources.map(source => source.name);
+    components = CONFIG.sources
+      .map(source => source.name)
+      .filter(nonEmptyString);
 
   /**
    * @param {string} component The component to build
@@ -84,6 +87,11 @@ if (module.id === '.') {
       if (!source) console.error(`Source type ${action} invalid`);
       else {
         log(`build ${action}`, `Building ${source.entry}`);
+
+        if (!source.entry) {
+          throw new Error(`Source "${source.name}" has no "entry" property`);
+        }
+
         const Bundler = require('parcel-bundler');
 
         if (CONFIG) {

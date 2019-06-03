@@ -1,0 +1,10 @@
+box: node:8
+build:
+  steps:
+    - npm-install
+    - script:
+      name: Test
+      code: npm test
+    - script:
+      name: Lint
+      code: node bin/runner lint

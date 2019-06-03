@@ -1,6 +1,6 @@
 const { log } = require('../log');
 const { spawnSync } = require('child_process');
-const { sync: globSync } = require('globby');
+const { sync: globSync } = require('glob');
 const { resolve } = require('path');
 
 const { env } = process;

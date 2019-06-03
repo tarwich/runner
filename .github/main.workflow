@@ -15,7 +15,7 @@ action "npm install" {
 
 action "github release" {
   uses = "docker://node:8"
-  needs = ["Lint"]
+  needs = ["Lint", "Test"]
   runs = "node"
   args = "src/actions/github-release"
   secrets = ["GITHUB_TOKEN"]
@@ -26,4 +26,11 @@ action "Lint" {
   needs = ["npm install"]
   runs = "node"
   args = "bin/runner lint"
+}
+
+action "Test" {
+  uses = "docker://node:8"
+  needs = ["npm install"]
+  runs = "npm"
+  args = "test"
 }
