@@ -15,8 +15,15 @@ let CONFIG;
  * restrict the process.
  * @param {object} options See below
  * @param {boolean} options.series Build each item in series instead of parallel
+ * @param {boolean} options.production Enable production mode for things like
+ * minification
  */
-async function build(components = [], options = { series: false }) {
+async function build(
+  components = [],
+  options = { series: false, production: false }
+) {
+  // Enable production environment variable
+  if (options.production) process.env.NODE_ENV = 'production';
   // There's a scenario where config doesn't exist and needs imported
   if (!CONFIG) CONFIG = require('../config');
   if (components.length === 0)
@@ -52,6 +59,10 @@ function install(program, config) {
   CONFIG = config;
   program
     .command(`build [${config.sources.map(s => s.name).join('|')}...]`)
+    .option(
+      '--production',
+      'Set NODE_ENV=production, which will do things like minify files'
+    )
     .option(
       '--series',
       'Build all the options one at a time instead of in parallel'
