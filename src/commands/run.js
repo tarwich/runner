@@ -2,6 +2,8 @@
 const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
+const { nonEmptyString } = require('../lib/type-guards');
+const { existsSync } = require('fs');
 
 const { env } = process;
 /** @type {import('config').Config} */
@@ -24,8 +26,11 @@ let CONFIG;
 async function run(components, options) {
   const { docker, port } = options;
   env.PORT = String(port);
-  if (components.length === 0)
-    components = CONFIG.sources.map(item => item.name);
+
+  if (components.length === 0) {
+    components = CONFIG.sources.map(item => item.name).filter(nonEmptyString);
+  }
+
   components.forEach(component => {
     fork(__filename, [], { env }).send({ CONFIG, action: component, docker });
   });
@@ -67,14 +72,19 @@ if (module.id === '.') {
         log(`run ${action}`, `Building ${source.entry}`);
         const Bundler = require('parcel-bundler');
 
+        if (!source.entry) {
+          throw new Error(`Source "${source.name}" has no "entry" property`);
+        }
+
+        if (!existsSync(resolve(source.entry))) {
+          throw new Error(`Can not find source entry file "${source.entry}"`);
+        }
+
         const bundler = new Bundler(resolve(source.entry), {
           ...source.parcel,
           watch: true,
         });
-        const {
-          run,
-          parcel: { outDir },
-        } = source;
+        const { run, parcel: { outDir } = { outDir: undefined } } = source;
         // Get Docker information
         if (docker && source.docker) require('../lib/docker').getDockerUrls();
         /** @type {import('child_process').ChildProcess} */

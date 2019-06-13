@@ -23,6 +23,27 @@ a `.runnerrc.js` file, or any other method that `CosmiConfig` supports.
 
 [cosmiconfig]: https://www.npmjs.com/package/cosmiconfig
 
+### File autodetection
+
+Runner will attempt to autodetect client and server files for you. The order of
+precedence for these files is:
+
+#### Client
+
+- src/client/index.html
+- src/client/index.htm
+- src/client/index.ts
+- src/client/index.js
+- client/index.html
+- client/index.htm
+- client/index.ts
+- client/index.js
+
+- src/server/index.ts
+- src/server/index.js
+- server/index.ts
+- server/index.js
+
 ### Build Command
 
 The build command will guess at configuration settings for client and server and
