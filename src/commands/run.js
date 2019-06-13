@@ -84,20 +84,23 @@ if (module.id === '.') {
           ...source.parcel,
           watch: true,
         });
-        const { run, parcel: { outDir } = { outDir: undefined } } = source;
+        const { run, parcel: { outDir = '', outFile = '' } = {} } = source;
         // Get Docker information
         if (docker && source.docker) require('../lib/docker').getDockerUrls();
         /** @type {import('child_process').ChildProcess} */
-        let server;
+        let child;
         if (run && outDir) {
-          // Run the server every time the build ends
+          const outPath = `${outDir}/${outFile}`;
+          // Run the source every time the build ends
           bundler.on('buildEnd', () => {
             log(
-              'run server',
-              `${server ? 'Restarting' : 'Starting'} server (${outDir})...`
+              `Run ${source.name}`,
+              `${child ? 'Restarting' : 'Starting'} ${
+                source.name
+              } (${outPath})...`
             );
-            if (server) server.kill();
-            server = fork(outDir, CONFIG.runArguments || [], { env });
+            if (child) child.kill();
+            child = fork(outPath, CONFIG.runArguments || [], { env });
           });
         }
         // Run the bundler
