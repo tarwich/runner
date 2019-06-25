@@ -27,27 +27,49 @@ async function getDockerUrls() {
         const services = String(shell.stdout)
           .split('\n')
           .map(line => {
-            const [, name = '', port = ''] =
-              line.match(/_([^_]+?)_\d+.*?(\d+)->/) || [];
-            return { name, port };
+            const [, name = ''] = line.match(/_([^_]+?)_\d+/) || [];
+            /** @type {{[key: string]: string}} */
+            const ports = (line.match(/\d+->\d+/g) || [])
+              .map(assignment => assignment.match(/\d+/g) || [])
+              .reduce(
+                (ports, [container, host]) => ({
+                  ...ports,
+                  [host]: container,
+                }),
+                {}
+              );
+            /** @type {string?} */
+            const defaultPort = Object.values(ports)[0];
+            return { name, ports, defaultPort };
           })
-          .filter(service => service.port);
+          .filter(service => Boolean(service.defaultPort));
 
         // Add a fake service to the front of the array to handle a generic
         // DATABASE_URL
         if (services.length)
-          services.unshift({ name: 'database', port: services[0].port });
+          services.unshift({
+            name: 'database',
+            ports: {},
+            defaultPort: services[0].defaultPort,
+          });
 
         services.forEach(service => {
-          const name = service.name.toUpperCase();
-          const envKey = `${name}_URL`;
-          env[`${name}_PORT`] = service.port;
+          const { name, ports, defaultPort } = service;
+          const uname = name.toUpperCase();
+          const envKey = `${uname}_URL`;
+          env[`${uname}_PORT`] = defaultPort || '';
           const envValue = env[envKey];
 
           if (envValue) {
-            env[envKey] = envValue.replace(/:\d+\//, `:${service.port}/`);
-            log('docker', `${envKey}: ${env[envKey]}`);
-          } else log('docker', `${service.name} port: ${service.port}`);
+            const [, envPort = ''] = envValue.match(/:(\d+)/) || [];
+            const servicePort = ports[envPort] || service.defaultPort;
+            env[envKey] = envValue.replace(`:${envPort}`, `:${servicePort}`);
+            console.log('docker', `${envKey}: ${env[envKey]}`);
+          } else
+            console.log(
+              'docker',
+              `${service.name} port: ${service.defaultPort}`
+            );
         });
       }
     }
