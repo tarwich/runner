@@ -1,6 +1,7 @@
 const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
+const { existsSync } = require('fs');
 const { nonEmptyString } = require('../lib/type-guards');
 
 const { env } = process;
@@ -93,6 +94,12 @@ if (module.id === '.') {
         }
 
         const Bundler = require('parcel-bundler');
+
+        // Do an explicit check before letting the bundler perform it's task to prevent empty folders
+        // from showing up. Even when files do not exist, the bundler has a tendency to make empty directories.
+        if (!existsSync(resolve(source.entry))) {
+          throw new Error(`No entries found at ${resolve(source.entry)}`);
+        }
 
         if (CONFIG) {
           const bundler = new Bundler(resolve(source.entry), source.parcel);

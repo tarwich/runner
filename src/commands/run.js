@@ -3,6 +3,7 @@ const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
 const { nonEmptyString } = require('../lib/type-guards');
+const { existsSync } = require('fs');
 
 const { env } = process;
 /** @type {import('config').Config} */
@@ -73,6 +74,10 @@ if (module.id === '.') {
 
         if (!source.entry) {
           throw new Error(`Source "${source.name}" has no "entry" property`);
+        }
+
+        if (!existsSync(resolve(source.entry))) {
+          throw new Error(`Can not find source entry file "${source.entry}"`);
         }
 
         const bundler = new Bundler(resolve(source.entry), {
