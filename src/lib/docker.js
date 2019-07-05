@@ -75,9 +75,6 @@ function replaceEnvVars(processes) {
 
       const winner = candidates[0];
 
-      // console.log({ envKey, envValue, envTag });
-      // console.log('candidates', JSON.stringify(candidates, null, '  '));
-
       if (winner) {
         process.env[envKey] = envValue.replace(envPort, winner.port.host);
       }
