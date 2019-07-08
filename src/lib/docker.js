@@ -45,7 +45,8 @@ async function getDockerUrls() {
 
   if (!processes) return;
 
-  replaceEnvVars(processes);
+  const replaced = replaceEnvVars(processes);
+  console.log(replaced);
 
   env.DOCKER = 'done';
 }
@@ -54,31 +55,41 @@ async function getDockerUrls() {
  * @param {typeof dockerProcesses} processes
  */
 function replaceEnvVars(processes) {
-  Object.entries(process.env)
-    .filter(([envKey]) => /_URL$/.test(envKey))
-    .forEach(([envKey, envValue = '']) => {
-      const envTag = envKey.replace(/_URL$/, '').toLowerCase();
-      const [, envPort = ''] = envValue.match(/:(\d+)/) || [];
+  const toReplace = Object.keys(process.env).filter(envKey =>
+    /_URL$/.test(envKey)
+  );
 
-      const candidates = Object.values(processes)
-        .map(process => {
-          const port = process.ports.find(port => port.container === envPort);
-          if (!port) return null;
-          const similarity = compareTwoStrings(envTag, process.name);
+  toReplace.forEach(envKey => {
+    const envValue = process.env[envKey] || '';
+    const envTag = envKey.replace(/_URL$/, '').toLowerCase();
+    const [, envPort = ''] = envValue.match(/:(\d+)/) || [];
 
-          return { ...process, port, similarity };
-        })
-        .filter(isTruthy)
-        .sort(
-          (a, b) => b.similarity - a.similarity || a.name.length - b.name.length
-        );
+    const candidates = Object.values(processes)
+      .map(process => {
+        const port = process.ports.find(port => port.container === envPort);
+        if (!port) return null;
+        const similarity = compareTwoStrings(envTag, process.name);
 
-      const winner = candidates[0];
+        return { ...process, port, similarity };
+      })
+      .filter(isTruthy)
+      .sort(
+        (a, b) => b.similarity - a.similarity || a.name.length - b.name.length
+      );
 
-      if (winner) {
-        process.env[envKey] = envValue.replace(envPort, winner.port.host);
-      }
-    });
+    const winner = candidates[0];
+
+    if (winner) {
+      process.env[envKey] = envValue.replace(envPort, winner.port.host);
+    }
+  });
+
+  return toReplace.reduce((result, key) => {
+    return {
+      ...result,
+      [key]: process.env[key],
+    };
+  }, {});
 }
 
 async function getDockerProcesses() {
