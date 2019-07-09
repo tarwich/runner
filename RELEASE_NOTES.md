@@ -1,3 +1,15 @@
+## 1.10.0
+
+## Added
+
+- [`ADDED`]: Check additional docker ports when updating environment variables
+- [`ADDED`]: Added testing to the project finally (#9)
+
+## Fixed
+
+- [`FIXED`]: Unresolved client or server sources in the configuration will no longer produce empty folders in the dist folder
+- [`FIXED`]: Unable to run when specifying outFile
+
 ## 1.9.0
 
 ## Added
