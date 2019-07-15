@@ -1,7 +1,7 @@
 const { shell } = require('../lib/shell');
 const { resolve } = require('path');
 const { existsSync, readFileSync, writeFileSync } = require('fs');
-const { inc } = require('semver');
+const { inc, compare } = require('semver');
 const { groupBy, uniq, upperFirst } = require('lodash');
 
 /** @type {{[key: string]: 'breaking' | 'added' | 'fixed' | 'task'}} */
@@ -43,7 +43,7 @@ function getReleaseType(notes) {
 function buildReleaseNotes(forVersion) {
   const tags = shell('git', ['tag', '--list'])
     .split('\n')
-    .sort(new Intl.Collator(undefined).compare);
+    .sort(compare);
   const previousVersion =
     tags[
       (tags.includes(forVersion) ? tags.indexOf(forVersion) : tags.length) - 1
