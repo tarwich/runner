@@ -137,9 +137,7 @@ class caretLinter extends Linter {
     const problems = results.filter(entry => entry.problem);
 
     this.log(
-      `Checked ${toCheck.length} dependencies. Found ${
-        problems.length
-      } dependencies with problems`
+      `Checked ${toCheck.length} dependencies. Found ${problems.length} dependencies with problems`
     );
 
     if (problems.length) {
