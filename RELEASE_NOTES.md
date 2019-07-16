@@ -1,3 +1,11 @@
+## 1.10.1
+
+## Fixed
+
+- [`FIXED`]: Some packages were displaying security vulnerabilities
+- [`FIXED`]: The tags do not sort correctly in release notes
+- [`FIXED`]: Unable to have more than one server
+
 ## 1.10.0
 
 ## Added
