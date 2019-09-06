@@ -69,42 +69,51 @@ if (module.id === '.') {
       const source = CONFIG.sources.find(item => item.name === action);
       if (!source) console.error(`Source type ${action} invalid`);
       else {
-        log(`run ${action}`, `Building ${source.entry}`);
-        const Bundler = require('parcel-bundler');
+        const runArguments = source.runArguments || CONFIG.runArguments;
 
-        if (!source.entry) {
+        if (source.entry) {
+          log(`Run ${action}`, `Building ${source.entry}`);
+          const Bundler = require('parcel-bundler');
+
+          if (!existsSync(resolve(source.entry))) {
+            throw new Error(`Can not find source entry file "${source.entry}"`);
+          }
+
+          const bundler = new Bundler(resolve(source.entry), {
+            ...source.parcel,
+            watch: true,
+          });
+          const { run, parcel: { outDir = '', outFile = '' } = {} } = source;
+          // Get Docker information
+          if (docker && source.docker) require('../lib/docker').getDockerUrls();
+          /** @type {import('child_process').ChildProcess} */
+          let child;
+          if (run && outDir) {
+            const outPath = `${outDir}/${outFile}`;
+            // Run the source every time the build ends
+            bundler.on('buildEnd', () => {
+              log(
+                `Run ${source.name}`,
+                `${child ? 'Restarting' : 'Starting'} ${
+                  source.name
+                } (${outPath})...`
+              );
+              if (child) child.kill();
+              child = fork(outPath, runArguments || [], { env });
+            });
+          }
+
+          // Run the bundler
+          bundler.bundle();
+        } else if (source.run && typeof source.run === 'string') {
+          log(
+            `Run ${source.name}`,
+            `Starting ${source.name} (${source.run})...`
+          );
+          fork(source.run, runArguments || [], { env });
+        } else {
           throw new Error(`Source "${source.name}" has no "entry" property`);
         }
-
-        if (!existsSync(resolve(source.entry))) {
-          throw new Error(`Can not find source entry file "${source.entry}"`);
-        }
-
-        const bundler = new Bundler(resolve(source.entry), {
-          ...source.parcel,
-          watch: true,
-        });
-        const { run, parcel: { outDir = '', outFile = '' } = {} } = source;
-        // Get Docker information
-        if (docker && source.docker) require('../lib/docker').getDockerUrls();
-        /** @type {import('child_process').ChildProcess} */
-        let child;
-        if (run && outDir) {
-          const outPath = `${outDir}/${outFile}`;
-          // Run the source every time the build ends
-          bundler.on('buildEnd', () => {
-            log(
-              `Run ${source.name}`,
-              `${child ? 'Restarting' : 'Starting'} ${
-                source.name
-              } (${outPath})...`
-            );
-            if (child) child.kill();
-            child = fork(outPath, CONFIG.runArguments || [], { env });
-          });
-        }
-        // Run the bundler
-        bundler.bundle();
       }
     } catch (error) {
       console.error(error);

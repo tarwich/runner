@@ -9,6 +9,8 @@ export declare interface Source {
   docker?: boolean;
   /** True if this item emits a runnable file (default: false) */
   run?: boolean;
+  /** Optional list of arguments to pass to the forked process */
+  runArguments?: string[];
   /** The entry file for the server compilation */
   entry: string;
   /** The parcel configuration options */
