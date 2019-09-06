@@ -145,4 +145,30 @@ describe('Config', () => {
 
     expect(client).to.have.property('entry', 'client/index.html');
   });
+
+  it('should not auto-add server if sources not found', async () => {
+    mockFs({
+      'server/': {},
+      'package.json': PACKAGE_JSON,
+    });
+
+    const config = loadConfig();
+
+    expect(config).to.not.have.property('server');
+    const server = config.sources.find(source => source.name === 'server');
+    if (server) throw new Error('Server exists in sources');
+  });
+
+  it('should not auto-add client if sources not found', async () => {
+    mockFs({
+      'client/': {},
+      'package.json': PACKAGE_JSON,
+    });
+
+    const config = loadConfig();
+
+    expect(config).to.not.have.property('client');
+    const client = config.sources.find(source => source.name === 'client');
+    if (client) throw new Error('Client exists in sources');
+  });
 });
