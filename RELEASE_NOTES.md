@@ -1,3 +1,10 @@
+## 1.11.0
+
+## Added
+
+- [`ADDED`]: Make the run system ignore server and client if their paths are invalid
+- [`ADDED`]: Make the run system not attempt to build things that have no entry
+
 ## 1.10.1
 
 ## Fixed
