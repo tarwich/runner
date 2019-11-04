@@ -28,11 +28,40 @@ async function run(components, options) {
   env.PORT = String(port);
 
   if (components.length === 0) {
+    const sourceById = new Map();
+    const completedSources = new Set();
+
+    // Set up source lookups and convert each source to an internal source structure
+    /** @type import('config').SourceInternal[] */
+    const sources = CONFIG.sources.map(source => {
+      if (source.id) sourceById.set(source.id, source);
+      /** @type import('config').SourceInternal[] */
+      const parentSources = [];
+      /** @type import('config').SourceInternal[] */
+      const childSources = [];
+
+      return Object.assign(source, {
+        parentSources,
+        childSources
+      });
+    });
+
+    // Set up parent/child relationships between sources
+    sources.forEach(source => {
+      if (Array.isArray(source.dependencies) && source.dependencies.length > 0) {
+        source.parentSources = source.dependencies.map(dep => {
+
+        });
+      }
+    });
+
+    const toProcess = [];
+
     components = CONFIG.sources.map(item => item.name).filter(nonEmptyString);
   }
 
   components.forEach(component => {
-    fork(__filename, [], { env }).send({ CONFIG, action: component, docker });
+    const child = fork(__filename, [], { env }).send({ CONFIG, action: component, docker });
   });
 }
 
@@ -67,6 +96,7 @@ if (module.id === '.') {
 
     try {
       const source = CONFIG.sources.find(item => item.name === action);
+      console.log('EXECUTING NEW SOURCE', source);
       if (!source) console.error(`Source type ${action} invalid`);
       else {
         const runArguments = source.runArguments || CONFIG.runArguments;

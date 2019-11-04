@@ -5,6 +5,13 @@ export type DependencyType = 'strict' | 'range' | 'ignore';
 export declare interface Source {
   /** Name to display in any output related to this source (optional) */
   name: string;
+  /** Makes this Source identifiable via this identifier. Used for setting up dependencies amongst sources */
+  id?: string;
+  /**
+   * Sets up sources this source will depend on being completed first before this source can execute. This will be a
+   * list of ids set on the parent Source.
+   */
+  dependencies?: string[];
   /** True if this entry utilizes docker (default: false) */
   docker?: boolean;
   /** True if this item emits a runnable file (default: false) */
@@ -15,6 +22,13 @@ export declare interface Source {
   entry: string;
   /** The parcel configuration options */
   parcel: ParcelOptions;
+}
+
+export declare interface SourceInternal extends Partial<Source> {
+  /** Internal tracking of which sources this source depends on */
+  parentSources: SourceInternal[];
+  /** Internal tracking of which sources depend on this source */
+  childSources: SourceInternal[];
 }
 
 export declare interface Config {
