@@ -22,13 +22,12 @@ export declare interface Source {
   entry: string;
   /** The parcel configuration options */
   parcel: ParcelOptions;
+  /** Internal tracking of which sources depend on this source. This should NOT be set in the config */
+  childSources?: string[];
 }
 
 export declare interface SourceInternal extends Partial<Source> {
-  /** Internal tracking of which sources this source depends on */
-  parentSources: SourceInternal[];
-  /** Internal tracking of which sources depend on this source */
-  childSources: SourceInternal[];
+
 }
 
 export declare interface Config {
