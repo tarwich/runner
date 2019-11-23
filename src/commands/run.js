@@ -3,7 +3,7 @@ const { fork } = require('child_process');
 const { log } = require('../log');
 const { resolve } = require('path');
 const { existsSync } = require('fs');
-const shell = require("shelljs");
+const touch = require('touch');
 
 const { env } = process;
 /** @type {import('config').Config} */
@@ -248,7 +248,6 @@ if (module.id === '.') {
 
           // Add a log message out to indicate the completion of the build or trigger depencies
           bundler.on('buildEnd', () => {
-
             // Submit the flag for the first build to have the dependencies complete running
             if (firstBuild) {
               firstBuild = false;
@@ -269,7 +268,7 @@ if (module.id === '.') {
               source.childSources.forEach(childName => {
                 const child = sourceById.get(childName);
                 if (!child) return;
-                shell.exec(`touch ${resolve(child.entry)}`);
+                touch.sync(resolve(child.entry));
               });
             }
           });
