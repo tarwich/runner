@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
+  }
+}
