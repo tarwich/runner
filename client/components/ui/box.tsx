@@ -8,9 +8,20 @@ export type BoxProps = {
   grid?: boolean;
   vertical?: boolean;
   horizontal?: boolean;
+
+  overflow?: boolean;
 };
 
-export const Box = styled.div<BoxProps>`
+export const Box = styled.div.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) => {
+    return (
+      !['grid', 'vertical', 'horizontal', 'overflow'].includes(prop) &&
+      defaultValidatorFn(prop)
+    );
+  },
+})<BoxProps>`
+  overflow: auto;
+
   ${(p) => {
     const { grid, vertical, horizontal } = p;
 

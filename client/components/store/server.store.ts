@@ -55,6 +55,18 @@ export const useServerStore = create(
           console.error(e);
         }
       },
+
+      clear: (serverName: string) => {
+        try {
+          set((state) => {
+            const server = state.servers.find((s) => s.name === serverName);
+
+            server.buffer = '';
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      },
     });
 
     socket.addEventListener(

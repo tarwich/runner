@@ -1,14 +1,13 @@
 const { resolve } = require('path');
 const { makeSocketRpc } = require('bidi-rpc');
 const { spawn, ChildProcess } = require('child_process');
+const ws = require('ws');
 
 const MODULE_NAME = 'runner';
 
 /**
  * @typedef {import('./types/config').ServerConfig} ServerConfig
  */
-
-const ws = require('ws');
 const { cosmiconfig } = require('cosmiconfig');
 
 /**
@@ -50,6 +49,7 @@ class Socket {
  * @typedef {object} RemoteRpc
  * @property {(server: string, command: string, data: string) => void} data
  * @property {(server: string, command: string, isRunning: boolean) => void} status
+ * @property {(server: string) => void} clear
  */
 
 class RunnerRpc {
@@ -137,6 +137,13 @@ class RunnerRpc {
 
     const { commands } = server;
 
+    // Special case for clear command
+    if (command === 'clear') {
+      buffers[serverName] = '';
+      this.remote.clear(serverName);
+      return;
+    }
+
     if (!commands[command]) {
       throw new Error(`Command ${command} not found`);
     }
@@ -148,7 +155,7 @@ class RunnerRpc {
 
     const child = spawn(commandText[0], commandText.slice(1), {
       cwd,
-      stdio: 'pipe',
+      stdio: ['ignore', 'pipe', 'pipe'],
       detached: true,
     });
 
@@ -161,16 +168,16 @@ class RunnerRpc {
     });
 
     child.on('exit', (code) => {
-      console.log(`Command ${serverName}.${command} exited with code ${code}`);
-      this.remote.data(
-        serverName,
-        command,
-        `Command ${serverName}.${command} exited with code ${code}`
-      );
+      const message = `Command ${serverName}.${command} exited with code ${code}`;
+      console.log(message);
+      this.remote.data(serverName, command, message);
+      this.remote.status(serverName, command, false);
     });
 
     child.on('close', (code) => {
-      console.log(`Command ${command} closed with code ${code}`);
+      const message = `Command ${command} closed with code ${code}`;
+      console.log(message);
+      this.remote.data(serverName, command, message);
       this.remote.status(serverName, command, false);
 
       const index = processes.findIndex((process) => process.child === child);

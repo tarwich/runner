@@ -18,6 +18,9 @@ async function main() {
     root: ROOT,
     server: {
       middlewareMode: true,
+      hmr: {
+        port: Math.floor(Math.random() * (65535 - 1024)) + 1024,
+      },
     },
   });
 
