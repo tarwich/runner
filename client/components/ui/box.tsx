@@ -8,8 +8,6 @@ export type BoxProps = {
   grid?: boolean;
   vertical?: boolean;
   horizontal?: boolean;
-
-  overflow?: boolean;
 };
 
 export const Box = styled.div.withConfig({
