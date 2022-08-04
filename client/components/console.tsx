@@ -38,6 +38,7 @@ const Terminal = styled.div<{ maximized?: boolean }>`
   font-family: 'Fira Code', monospace;
   font-size: 14px;
   white-space: pre-wrap;
+  word-break: break-word;
   line-height: 1.5;
   padding: 0.5rem;
   overflow-y: auto;
