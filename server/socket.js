@@ -1,4 +1,3 @@
-const { resolve } = require('path');
 const { makeSocketRpc } = require('bidi-rpc');
 const { spawn, ChildProcess } = require('child_process');
 const ws = require('ws');
@@ -53,6 +52,8 @@ class Socket {
  */
 
 class RunnerRpc {
+  bufferSize = 20_000;
+
   /**
    * @param {import('bidi-rpc').ISocket} socket
    */
@@ -62,6 +63,14 @@ class RunnerRpc {
      * @type {import('bidi-rpc').Rpc<RemoteRpc>}
      */
     this.remote = makeSocketRpc(socket, this);
+
+    cosmiconfig(MODULE_NAME)
+      .search()
+      .then(({ config }) => {
+        if (config) {
+          this.bufferSize = config.bufferSize;
+        }
+      });
   }
 
   /** @private */
@@ -190,6 +199,8 @@ class RunnerRpc {
 
     child.stdout.on('data', (data) => {
       buffers[serverName] = (buffers[serverName] || '') + data;
+      // Truncate the buffer
+      buffers[serverName] = buffers[serverName].slice(-this.bufferSize);
       this.remote.data(serverName, command, data.toString()).catch((error) => {
         console.error(error);
       });
@@ -197,6 +208,8 @@ class RunnerRpc {
 
     child.stderr.on('data', (data) => {
       buffers[serverName] = (buffers[serverName] || '') + data;
+      // Truncate the buffer
+      buffers[serverName] = buffers[serverName].slice(-this.bufferSize);
       this.remote.data(serverName, command, data.toString()).catch((error) => {
         console.error(error);
       });
