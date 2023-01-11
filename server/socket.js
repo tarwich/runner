@@ -1,4 +1,4 @@
-const { makeSocketRpc } = require('bidi-rpc');
+const { makeSocketRpc } = require('@tarwich/bidi-rpc');
 const { spawn, ChildProcess } = require('child_process');
 const ws = require('ws');
 
@@ -55,12 +55,12 @@ class RunnerRpc {
   bufferSize = 20_000;
 
   /**
-   * @param {import('bidi-rpc').ISocket} socket
+   * @param {import('@tarwich/bidi-rpc').ISocket} socket
    */
   constructor(socket) {
     this.socket = socket;
     /**
-     * @type {import('bidi-rpc').Rpc<RemoteRpc>}
+     * @type {import('@tarwich/bidi-rpc').Rpc<RemoteRpc>}
      */
     this.remote = makeSocketRpc(socket, this);
 

@@ -105,6 +105,11 @@ export const ConsoleBox = styled(Box)<{ maximized?: boolean }>`
     `}
 `;
 
+const ButtonsBox = styled(Box)`
+  overflow: hidden;
+`;
+ButtonsBox.defaultProps = { horizontal: true };
+
 export const Console = (props: Props) => {
   const { server } = props;
   const { rpc } = useServerStore();
@@ -120,7 +125,7 @@ export const Console = (props: Props) => {
         <ExpandIcon
           onClick={stopPropagation((e) => setMaximized(!maximized))}
         />
-        <Box horizontal>
+        <ButtonsBox>
           {server.commands
             .concat({ name: 'clear', isRunning: false })
             .map((command, i) => (
@@ -138,7 +143,7 @@ export const Console = (props: Props) => {
                 {command.name}
               </CommandButton>
             ))}
-        </Box>
+        </ButtonsBox>
       </ConsoleTitle>
       <Collapse expanded={expanded}>
         <Terminal ref={terminalRef} maximized={maximized}>

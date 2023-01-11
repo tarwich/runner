@@ -13,27 +13,27 @@
     "test": "mocha test/*.test.js"
   },
   "dependencies": {
-    "@tanstack/react-query": "^4.0.10",
-    "@types/express": "^4.17.13",
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6",
-    "@types/styled-components": "^5.1.25",
-    "@vitejs/plugin-react": "^2.0.0",
+    "@tanstack/react-query": "^4.22.0",
+    "@tarwich/bidi-rpc": "^1.5.0",
+    "@types/express": "^4.17.15",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.10",
+    "@types/styled-components": "^5.1.26",
+    "@vitejs/plugin-react": "^3.0.1",
     "ansi-to-react": "^6.1.6",
     "babel-plugin-styled-components": "^2.0.7",
-    "bidi-rpc": "git+https://github.com/tarwich/bidi-rpc.git",
-    "cosmiconfig": "^7.0.1",
-    "dotenv": "^16.0.1",
-    "express": "^4.18.1",
-    "immer": "^9.0.15",
+    "cosmiconfig": "^8.0.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "immer": "^9.0.17",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled": "^1.0.0",
-    "styled-components": "^5.3.5",
-    "typescript": "^4.7.4",
-    "vite": "^3.0.3",
-    "ws": "^8.8.1",
-    "zustand": "^4.0.0-rc.4"
+    "styled-components": "^5.3.6",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4",
+    "ws": "^8.12.0",
+    "zustand": "^4.3.1"
   },
   "bin": {
     "runner": "./bin/runner.js"
@@ -48,6 +48,6 @@
     "endOfLine": "lf"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.3"
+    "@types/ws": "^8.5.4"
   }
 }

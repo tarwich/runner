@@ -1,4 +1,4 @@
-import { makeSocketRpc, Rpc } from 'bidi-rpc';
+import { makeSocketRpc, Rpc } from '@tarwich/bidi-rpc';
 import create from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { Server } from '../../types/server';

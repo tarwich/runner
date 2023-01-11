@@ -10,7 +10,7 @@ const ROOT = resolve(__dirname, '../') + '/';
 
 async function main() {
   const app = express();
-  /** @type {{config: import('./socket').ServerConfig}} */
+  /** @type {{config: Partial<import('./socket').ServerConfig>}} */
   const { config } = await cosmiconfig('runner').search();
   const PORT = config.port || 8080;
 
